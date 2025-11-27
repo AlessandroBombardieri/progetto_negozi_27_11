@@ -1,0 +1,375 @@
+/* Funzioni. */
+
+/* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
+vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
+a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.
+L’applicazione dello sconto avviene su scelta del cliente, e lo sconto viene applicato sul totale della fattura
+sulla quale viene applicato. In seguito all’applicazione dello sconto, il saldo punti della tessera fedeltà deve
+essere decurtato del numero di punti usato per lo sconto. */
+
+/* Proposta degli sconti applicabili in base al saldo punti relativo alla tessera fedeltà del cliente. */
+CREATE OR REPLACE FUNCTION get_sconti_applicabili(_codice_fiscale VARCHAR)
+RETURNS TABLE (
+    _punti_necessari INT,
+    _sconto_ottenuto NUMERIC
+) AS $$
+DECLARE
+    _punti_correnti INT;
+BEGIN
+    -- Salvo i punti correnti dell'utente all'interno dell'attributo _punti_correnti
+    SELECT saldo_punti INTO _punti_correnti
+    FROM tessera_fedelta
+    WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
+    -- Se i punti correnti sono almeno 100, allora proponi una sconto pari al 5%
+    IF _punti_correnti >= 100 THEN
+        RETURN QUERY SELECT 100, 5.0;
+    END IF;
+    -- Se i punti correnti sono almeno 200, allora proponi una sconto pari al 15%
+    IF _punti_correnti >= 200 THEN
+        RETURN QUERY SELECT 200, 15.0;
+    END IF;
+    -- Se i punti correnti sono almeno 300, allora proponi una sconto pari al 30%
+    IF _punti_correnti >= 300 THEN
+        RETURN QUERY SELECT 300, 30.0;
+    END IF;
+END;
+$$ language 'plpgsql';
+
+/* 3.2.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
+RETURNS TABLE (
+    codice_fiscale varchar
+    nome varchar,
+    cognome varchar,
+    email varchar,
+    saldo_punti bigint,
+    data_rilascio date
+) AS $$
+BEGIN
+SELECT
+    u.codice_fiscale,
+    u.nome,
+    u.cognome,
+    u.email,
+    t.saldo_punti,
+    t.data_rilascio
+FROM tessera_fedelta AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
+WHERE t.codice_negozio = _codice_negozio AND t.dismessa = FALSE
+ORDER BY u.cognome, u.nome;
+END;
+$$ LANGUAGE plpgsql;
+
+/* 3.2.7. Storico ordini a fornitori. Dato un fornitore, è necessario conoscere tutti gli ordini che sono stati effettuati presso di lui. */
+CREATE OR REPLACE FUNCTION get_storico_ordini_by_fornitore(_partita_iva VARCHAR)
+RETURNS TABLE (
+    numero_ordine UUID,
+    codice_prodotto UUID,
+    codice_negozio UUID,
+    quantita_ordinata INT8,
+    data_ordine DATE,
+    data_consegna DATE,
+    totale FLOAT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.numero_ordine,
+        o.codice_prodotto,
+        o.codice_negozio,
+        o.quantita_ordinata,
+        o.data_ordine,
+        o.data_consegna,
+        o.totale
+    FROM ordine o
+    WHERE o.partita_iva = _partita_iva
+    ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di verificare la validità delle credenziali di login fornite. */
+CREATE OR REPLACE FUNCTION check_login(
+    _email VARCHAR,
+    _password VARCHAR
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    esiste BOOLEAN := FALSE;
+BEGIN
+    SELECT TRUE INTO esiste
+    FROM utente
+    WHERE email = _email AND password = _password;
+    RETURN esiste;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi a tutti gli utenti. */
+CREATE OR REPLACE FUNCTION get_all_utenti()
+RETURNS TABLE (
+    codice_fiscale VARCHAR,
+    email VARCHAR,
+    ruolo VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    provincia VARCHAR,
+    citta VARCHAR,
+    via VARCHAR,
+    civico VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.email,
+        u.manager,
+        u.nome,
+        u.cognome,
+        u.provincia,
+        u.citta,
+        u.via,
+        u.civico
+    FROM utente AS u;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi ad un utente identificato tramite email. */
+CREATE OR REPLACE FUNCTION get_utente_by_email(_email VARCHAR)
+RETURNS TABLE (
+    codice_fiscale VARCHAR,
+    email VARCHAR,
+    ruolo VARCHAR,
+    password VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    provincia VARCHAR,
+    citta VARCHAR,
+    via VARCHAR,
+    civico VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.email,
+        u.password,
+        u.manager,
+        u.nome,
+        u.cognome,
+        u.provincia,
+        u.citta,
+        u.via,
+        u.civico
+    FROM utente u
+    WHERE u.email = _email;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi a tutti i prodotti. */
+CREATE OR REPLACE FUNCTION get_all_prodotti()
+RETURNS TABLE (
+    codice_prodotto UUID,
+    nome VARCHAR,
+    descrizione VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.codice_prodotto, p.nome, p.descrizione
+    FROM prodotto p
+    ORDER BY p.nome;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi ai prodotti in vendita presso un negozio. */
+CREATE OR REPLACE FUNCTION get_prodotti_by_negozio(_codice_negozio UUID)
+RETURNS TABLE (
+    codice_prodotto UUID,
+    nome VARCHAR,
+    descrizione VARCHAR,
+    prezzo FLOAT8,
+    quantita INT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.codice_prodotto,
+        p.nome,
+        p.descrizione,
+        v.prezzo,
+        v.quantita
+    FROM vende v
+    JOIN prodotto p ON p.codice_prodotto = v.codice_prodotto
+    WHERE v.codice_negozio = _codice_negozio;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi ai prodotti in vendita presso un fornitore. */
+CREATE OR REPLACE FUNCTION get_prodotti_by_fornitore(_partita_iva VARCHAR)
+RETURNS TABLE (
+    codice_prodotto UUID,
+    nome VARCHAR,
+    descrizione VARCHAR,
+    prezzo FLOAT8,
+    quantita INT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.codice_prodotto,
+        p.nome,
+        p.descrizione,
+        v.prezzo,
+        v.quantita
+    FROM venduto_da v JOIN prodotto p ON p.codice_prodotto = v.codice_prodotto
+    WHERE v.partita_iva = _partita_iva;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi agli ordini effettuati da parte di un negozio. */
+CREATE OR REPLACE FUNCTION get_ordini_by_negozio(_codice_negozio UUID)
+RETURNS TABLE (
+    numero_ordine UUID,
+    data_ordine DATE,
+    data_consegna DATE,
+    totale FLOAT8,
+    codice_prodotto UUID,
+    partita_iva VARCHAR,
+    quantita_ordinata INT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.numero_ordine,
+        o.data_ordine,
+        o.data_consegna,
+        o.totale,
+        o.codice_prodotto,
+        o.partita_iva,
+        o.quantita_ordinata
+    FROM ordine AS o
+    WHERE o.codice_negozio = _codice_negozio
+    ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi agli ordini riguardanti un prodotto. */
+CREATE OR REPLACE FUNCTION get_ordini_by_prodotto(_codice_prodotto UUID)
+RETURNS TABLE (
+    numero_ordine UUID,
+    data_ordine DATE,
+    data_consegna DATE,
+    totale FLOAT8,
+    codice_negozio UUID,
+    partita_iva VARCHAR,
+    quantita_ordinata INT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.numero_ordine,
+        o.data_ordine,
+        o.data_consegna,
+        o.totale,
+        o.codice_negozio,
+        o.partita_iva,
+        o.quantita_ordinata
+    FROM ordine AS o
+    WHERE o.codice_prodotto = _codice_prodotto
+    ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle fatture che coinvolgono un utente. */
+CREATE OR REPLACE FUNCTION get_fatture_by_utente(_codice_fiscale VARCHAR)
+RETURNS TABLE (
+    codice_fattura UUID,
+    data_acquisto DATE,
+    totale FLOAT8,
+    sconto_percentuale FLOAT8,
+    totale_pagato FLOAT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        f.codice_fattura,
+        f.data_acquisto,
+        f.totale,
+        f.sconto_percentuale,
+        f.totale_pagato
+    FROM fattura AS f
+    WHERE f.codice_fiscale = _codice_fiscale
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle fatture che coinvolgono un negozio. */
+CREATE OR REPLACE FUNCTION get_fatture_by_negozio(_codice_negozio UUID)
+RETURNS TABLE (
+    codice_fattura UUID,
+    codice_fiscale VARCHAR,
+    codice_prodotto UUID,
+    quantita_acquistata INT8,
+    prezzo FLOAT8,
+    data_acquisto DATE,
+    totale FLOAT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.codice_fattura,
+        f.codice_fiscale,
+        e.codice_prodotto,
+        e.quantita_acquistata,
+        e.prezzo,
+        f.data_acquisto,
+        f.totale
+    FROM emette e JOIN fattura f ON f.codice_fattura = e.codice_fattura
+    WHERE e.codice_negozio = _codice_negozio;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle fatture che coinvolgono un prodotto. */
+CREATE OR REPLACE FUNCTION get_fatture_by_prodotto(_codice_prodotto UUID)
+RETURNS TABLE (
+    codice_fattura UUID,
+    codice_fiscale VARCHAR,
+    codice_negozio UUID,
+    quantita_acquistata INT8,
+    prezzo FLOAT8,
+    data_acquisto DATE,
+    totale FLOAT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.codice_fattura,
+        f.codice_fiscale,
+        e.codice_negozio,
+        e.quantita_acquistata,
+        e.prezzo,
+        f.data_acquisto,
+        f.totale
+    FROM emette e JOIN fattura f ON f.codice_fattura = e.codice_fattura
+    WHERE e.codice_prodotto = _codice_prodotto;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle tessere fedeltà di un utente. */
+CREATE OR REPLACE FUNCTION get_tessere_by_utente(_codice_fiscale VARCHAR)
+RETURNS TABLE (
+    codice_tessera UUID,
+    saldo_punti    INT8,
+    codice_negozio UUID,
+    data_rilascio  DATE,
+    dismessa       BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.codice_tessera,
+        t.saldo_punti,
+        t.codice_negozio,
+        t.data_rilascio,
+        t.dismessa
+    FROM tessera_fedelta AS t
+    WHERE t.codice_fiscale = _codice_fiscale
+    ORDER BY t.data_rilascio DESC
+END;
+$$ LANGUAGE plpgsql;
