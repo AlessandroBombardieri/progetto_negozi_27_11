@@ -12,8 +12,7 @@ CREATE OR REPLACE PROCEDURE update_totale_fattura(
     _codice_fattura UUID,
     _codice_fiscale VARCHAR,
     _punti_utilizzati INT
-)
-RETURNS VOID AS $$
+) AS $$
 DECLARE
     _sconto_percentuale NUMERIC := 0;
     _fattura_totale FLOAT8;
@@ -65,50 +64,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* 3.2.5. Ordine prodotti da fornitore. Quando un prodotto deve essere rifornito di una certa quantità,
-è necessario inserire un ordine presso un determinato fornitore. Il fornitore deve essere automaticamente
-scelto sulla base del criterio di economicità (vale a dire, l’ordine viene automaticamente effettuato presso il fornitore che,
-oltre ad avere disponibili`a di prodotto sufficiente, offre il costo minore). */
-CREATE OR REPLACE PROCEDURE ordina_prodotto_as_negozio(
-    _codice_prodotto UUID,
-    _quantita INT,
-    _codice_negozio UUID
-)
-RETURNS UUID AS $$
-DECLARE
-    _partita_iva VARCHAR(11);
-    _prezzo      FLOAT8;
-    _ordine_id   UUID;
-    _totale      FLOAT8;
-BEGIN
-    -- Determino il fornitore il quale vende il prodotto di interesse in quantità sufficiente al minor prezzo unitario.
-    SELECT vd.partita_iva, vd.prezzo
-    INTO _partita_iva, _prezzo
-    FROM venduto_da vd
-    WHERE vd.codice_prodotto = _codice_prodotto AND vd.quantita >= _quantita
-    ORDER BY vd.prezzo ASC
-    LIMIT 1;
-    -- Se non è stato individuato alcun fornitore allora segnala errore.
-    IF _partita_iva IS NULL THEN
-        RAISE EXCEPTION 'Nessun fornitore disponibile con scorte sufficienti';
-    END IF;
-    -- Calcola il totale dell'ordine e popola la tabella ordine inserendo la data odierna come data di ordinazione e NULL come data di consegna.
-    _totale := _prezzo * _quantita;
-    INSERT INTO ordine (data_ordine, data_consegna, totale, codice_negozio, codice_prodotto, partita_iva, quantita_ordinata)
-    VALUES (CURRENT_DATE, NULL, _totale, _codice_negozio, _codice_prodotto, _partita_iva, _quantita)
-    -- Ritorna il codice dell'ordine appena creato.
-    RETURNING numero_ordine INTO _ordine_id;
-    RETURN _ordine_id;
-END;
-$$ LANGUAGE plpgsql;
-
 /* Permette di modificare la password relativa ad un utente con una nuova, a patto che la vecchia password fornita sia corretta. */
 CREATE OR REPLACE PROCEDURE change_password(
     _codice_fiscale VARCHAR,
     _vecchia_password VARCHAR,
     _nuova_password VARCHAR
-)
-RETURNS VOID AS $$
+) AS $$
 DECLARE
     match BOOLEAN := FALSE;
 BEGIN
@@ -138,8 +99,7 @@ CREATE OR REPLACE PROCEDURE add_utente(
     _citta VARCHAR,
     _via VARCHAR,
     _civico VARCHAR
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     INSERT INTO utente(codice_fiscale, email, password, manager, nome, cognome, provincia, citta, via, civico)
     VALUES (_codice_fiscale, _email, _password, _manager, _nome, _cognome, _provincia, _citta, _via, _civico);
@@ -151,8 +111,7 @@ CREATE OR REPLACE PROCEDURE add_negozio(
     _indirizzo VARCHAR,
     _orario VARCHAR,
     _responsabile VARCHAR
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
     VALUES (_indirizzo, _orario, _responsabile, FALSE);
@@ -163,8 +122,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE add_prodotto(
     _nome VARCHAR,
     _descrizione VARCHAR
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     INSERT INTO prodotto(nome, descrizione)
     VALUES (_nome, _descrizione);
@@ -175,8 +133,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE add_fornitore(
     _partita_iva VARCHAR,
     _indirizzo VARCHAR
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     INSERT INTO fornitore(partita_iva, indirizzo)
     VALUES (_partita_iva, _indirizzo);
@@ -189,8 +146,7 @@ CREATE OR REPLACE PROCEDURE add_tessera(
     _codice_negozio UUID,
     _codice_fiscale VARCHAR,
     _data DATE
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     -- Se il codice fiscale dell'utente non trova alcuna corrispondenza allora segnala errore.
     IF NOT EXISTS (SELECT 1 FROM utente  WHERE codice_fiscale = _codice_fiscale) THEN
@@ -232,8 +188,7 @@ CREATE OR REPLACE PROCEDURE add_prodotto_as_fornitore(
     _codice_prodotto UUID,
     _prezzo FLOAT8,
     _quantita INT
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     INSERT INTO venduto_da(partita_iva, codice_prodotto, prezzo, quantita)
     VALUES (_partita_iva, _codice_prodotto, _prezzo, _quantita);
@@ -245,8 +200,7 @@ CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
     _codice_negozio UUID,
     _codice_prodotto UUID,
     _nuovo_prezzo FLOAT8
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     IF p_nuovo_prezzo < 0 THEN
         RAISE EXCEPTION 'Prezzo negativo non ammesso';
@@ -266,8 +220,7 @@ CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
     _partita_iva VARCHAR,
     _codice_prodotto UUID,
     _prezzo FLOAT8
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     UPDATE venduto_da
     SET prezzo = _prezzo
@@ -280,8 +233,7 @@ CREATE OR REPLACE PROCEDURE update_quantita_prodotto_as_fornitore(
     _partita_iva VARCHAR,
     _codice_prodotto UUID,
     _quantita INT
-)
-RETURNS VOID AS $$
+) AS $$
 BEGIN
     UPDATE venduto_da
     SET quantita = quantita + _quantita
@@ -293,8 +245,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE update_data_consegna_ordine(
     _numero_ordine UUID,
     _data DATE
-)
-RETURNS VOID AS $$
+) AS $$
 DECLARE
     _data_ordine DATE;
 BEGIN
@@ -323,8 +274,7 @@ Se il codice_negozio è NULL, allora i prodotti in vendita vengono semplicemente
 CREATE OR REPLACE PROCEDURE dismetti_negozio(
     _codice_negozio UUID,
     _nuovo_negozio UUID DEFAULT NULL
-)
-RETURNS VOID AS $$
+) AS $$
 DECLARE
     r RECORD;
 BEGIN

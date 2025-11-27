@@ -35,10 +35,47 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+/* 3.2.5. Ordine prodotti da fornitore. Quando un prodotto deve essere rifornito di una certa quantità,
+è necessario inserire un ordine presso un determinato fornitore. Il fornitore deve essere automaticamente
+scelto sulla base del criterio di economicità (vale a dire, l’ordine viene automaticamente effettuato presso il fornitore che,
+oltre ad avere disponibili`a di prodotto sufficiente, offre il costo minore). */
+CREATE OR REPLACE FUNCTION ordina_prodotto_as_negozio(
+    _codice_prodotto UUID,
+    _quantita INT,
+    _codice_negozio UUID
+)
+RETURNS UUID AS $$
+DECLARE
+    _partita_iva VARCHAR(11);
+    _prezzo      FLOAT8;
+    _ordine_id   UUID;
+    _totale      FLOAT8;
+BEGIN
+    -- Determino il fornitore il quale vende il prodotto di interesse in quantità sufficiente al minor prezzo unitario.
+    SELECT vd.partita_iva, vd.prezzo
+    INTO _partita_iva, _prezzo
+    FROM venduto_da vd
+    WHERE vd.codice_prodotto = _codice_prodotto AND vd.quantita >= _quantita
+    ORDER BY vd.prezzo ASC
+    LIMIT 1;
+    -- Se non è stato individuato alcun fornitore allora segnala errore.
+    IF _partita_iva IS NULL THEN
+        RAISE EXCEPTION 'Nessun fornitore disponibile con scorte sufficienti';
+    END IF;
+    -- Calcola il totale dell'ordine e popola la tabella ordine inserendo la data odierna come data di ordinazione e NULL come data di consegna.
+    _totale := _prezzo * _quantita;
+    INSERT INTO ordine (data_ordine, data_consegna, totale, codice_negozio, codice_prodotto, partita_iva, quantita_ordinata)
+    VALUES (CURRENT_DATE, NULL, _totale, _codice_negozio, _codice_prodotto, _partita_iva, _quantita)
+    -- Ritorna il codice dell'ordine appena creato.
+    RETURNING numero_ordine INTO _ordine_id;
+    RETURN _ordine_id;
+END;
+$$ LANGUAGE plpgsql;
+
 /* 3.2.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
 CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
 RETURNS TABLE (
-    codice_fiscale varchar
+    codice_fiscale varchar,
     nome varchar,
     cognome varchar,
     email varchar,
@@ -295,7 +332,7 @@ BEGIN
         f.sconto_percentuale,
         f.totale_pagato
     FROM fattura AS f
-    WHERE f.codice_fiscale = _codice_fiscale
+    WHERE f.codice_fiscale = _codice_fiscale;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -370,6 +407,6 @@ BEGIN
         t.dismessa
     FROM tessera_fedelta AS t
     WHERE t.codice_fiscale = _codice_fiscale
-    ORDER BY t.data_rilascio DESC
+    ORDER BY t.data_rilascio DESC;
 END;
 $$ LANGUAGE plpgsql;

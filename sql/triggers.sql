@@ -16,7 +16,7 @@ $$ language 'plpgsql';
 CREATE TRIGGER i_update_saldo_tessera
 AFTER INSERT ON fattura
 FOR EACH ROW
-EXECUTE FUNCTION f_aggiorna_punti();
+EXECUTE FUNCTION update_saldo_tessera();
 
 /* 3.2.4. Aggiornamento disponibilità prodotti dai fornitori. La disponibilità dei prodotti dai vari fornitori
 è ovviamente limitata (e comunicata da ciascun fornitore alla catena di negozi).
@@ -51,6 +51,8 @@ BEGIN
     -- Aggiorno la tabella vende per il negozio che ha effettuato l'ordine.
     INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
     VALUES (NEW.codice_negozio, NEW.codice_prodotto, _prezzo_fornitore, NEW.quantita_ordinata)
+    ON CONFLICT (codice_negozio, codice_prodotto)
+    DO UPDATE SET quantita = vende.quantita + EXCLUDED.quantita;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -58,7 +60,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER i_update_disponibilita_as_fornitore
 AFTER INSERT ON ordine
 FOR EACH ROW
-EXECUTE FUNCTION update_disponibilita();
+EXECUTE FUNCTION update_disponibilita_as_fornitore();
 
 /* Permette di impedire la creazione di una nuova tessera fedeltà se un utente ne possiede già una attiva. */
 CREATE OR REPLACE FUNCTION tessera_gia_presente()
@@ -79,13 +81,14 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER i_tessera_gia_presente
 BEFORE INSERT ON tessera_fedelta
 FOR EACH ROW
-EXECUTE FUNCTION f_tessera_unica();
+EXECUTE FUNCTION tessera_gia_presente();
 
 /* Permette di impedire la creazione di un ordine se la data di consegna dovesse già venir selezionata. */
 CREATE OR REPLACE FUNCTION data_consegna_ordine_is_not_empty()
-RETURNS VOID AS $$
+RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.data_consegna IS NOT NULL THEN RAISE EXCEPTION 'La data di consegna non può essere impostata al momento dell''ordine';
+    IF NEW.data_consegna IS NOT NULL THEN
+        RAISE EXCEPTION 'La data di consegna non può essere impostata al momento dell''ordine';
     END IF;
     RETURN NEW;
 END;
@@ -94,4 +97,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER i_data_consegna_ordine_is_not_empty
 BEFORE INSERT ON ordine
 FOR EACH ROW
-EXECUTE FUNCTION f_no_consegna_on_insert();
+EXECUTE FUNCTION data_consegna_ordine_is_not_empty();
