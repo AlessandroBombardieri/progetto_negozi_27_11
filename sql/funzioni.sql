@@ -124,7 +124,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* Permette di verificare la validità delle credenziali di login fornite. */
-CREATE OR REPLACE FUNCTION check_login(
+/*CREATE OR REPLACE FUNCTION check_login(
     _email VARCHAR,
     _password VARCHAR
 )
@@ -136,6 +136,20 @@ BEGIN
     FROM utente
     WHERE email = _email AND password = _password;
     RETURN esiste;
+END;
+$$ LANGUAGE plpgsql;*/
+
+/* Permette di verificare la validità delle credenziali di login fornite, restituendo il codice fiscale dell'utente qualora risultino valide. */
+CREATE OR REPLACE FUNCTION check_login(
+    _email VARCHAR,
+    _password VARCHAR
+)
+RETURNS VARCHAR AS $$
+BEGIN
+    SELECT codice_fiscale
+    FROM utente
+    WHERE email = _email AND password = _password;
+    RETURN codice_fiscale;
 END;
 $$ LANGUAGE plpgsql;
 
