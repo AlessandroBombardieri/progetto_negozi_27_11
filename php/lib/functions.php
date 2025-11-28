@@ -23,8 +23,8 @@ function parseError($error) {
  * Apre la connessione con il server db.
  */
 function open_pg_connection(){
-    include_once('../config/config.php');
-    $conn = "host=".db_host." dbname=".db_name." user=".db_user." password=".db_pass;
+    include_once('../conf/conf.php');
+    $conn = "host=".DB_HOST." dbname=".DB_NAME." user=".DB_USER." password=".DB_PASS;
     return pg_connect($conn);
 }
 
@@ -43,7 +43,8 @@ function close_pg_connection($db){
 function check_login($usr, $psw){
     $db = open_pg_connection();
     $params = array($usr, $psw);
-    $sql = "CALL check_login($1, $2);";
+    $sql = "SELECT * FROM check_login($1, $2)";
+    //$sql = "CALL check_login($1, $2);";
     $result = pg_prepare($db, 'login', $sql);
     $result = pg_execute($db, 'login', $params);
     close_pg_connection($db);
