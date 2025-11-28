@@ -145,11 +145,13 @@ CREATE OR REPLACE FUNCTION check_login(
     _password VARCHAR
 )
 RETURNS VARCHAR AS $$
+DECLARE
+    _codice_fiscale VARCHAR;
 BEGIN
-    SELECT codice_fiscale
+    SELECT codice_fiscale INTO _codice_fiscale
     FROM utente
     WHERE email = _email AND password = _password;
-    RETURN codice_fiscale;
+    RETURN _codice_fiscale;
 END;
 $$ LANGUAGE plpgsql;
 

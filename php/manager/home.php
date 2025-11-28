@@ -3,7 +3,6 @@
     ini_set("error_reporting", E_ALL);
      include_once ('../lib/functions.php'); 
     session_start();
-
     if (!isset($_SESSION['id'])){
         redirect('../index.php');
     }

@@ -15,7 +15,7 @@
             }
             $_SESSION['feedback'] = $esito;
 
-            redirect('../cliente/home.php');
+            redirect('../manager/home.php');
             /*if ($esito) {
                 switch ($tipo) {
                     case 'studente':
