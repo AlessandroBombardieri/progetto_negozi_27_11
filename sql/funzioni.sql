@@ -175,7 +175,7 @@ BEGIN
     SELECT
         u.codice_fiscale,
         u.email,
-        u.manager,
+        u.ruolo,
         u.nome,
         u.cognome,
         u.provincia,
@@ -206,7 +206,7 @@ BEGIN
         u.codice_fiscale,
         u.email,
         u.password,
-        u.manager,
+        u.ruolo,
         u.nome,
         u.cognome,
         u.provincia,

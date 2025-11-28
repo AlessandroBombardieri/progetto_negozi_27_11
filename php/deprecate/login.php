@@ -14,21 +14,11 @@ if (isset($_POST)) {
         if (!is_null($cf)) {
             $_SESSION['id'] = $cf;
         }
+        $_SESSION['feedback'] = $esito;
         if ($esito) {
-            $user = get_utente_by_codice_fiscale($cf);
-            if (session_status() === PHP_SESSION_ACTIVE) {
-                session_regenerate_id(true);
-            }
-            $_SESSION['id'] = [
-                'email' => $user['email'],
-                'codice_fiscale' => $user['codice_fiscale'],
-                'ruolo' => $user['ruolo'],
-                'nome' => $user['nome'],
-                'cognome' => $user['cognome'],
-            ];
             switch ($ruolo) {
                 case 'manager':
-                    redirect('../manager/home_variante.php');
+                    redirect('../manager/home.php');
                     break;
                 /*case 'utente':
                     redirect('../utente/home.php');
