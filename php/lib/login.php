@@ -14,7 +14,7 @@
                 $_SESSION['id'] = $cf;
             }
             $_SESSION['feedback'] = $esito;
-
+            
             redirect('../manager/home.php');
             /*if ($esito) {
                 switch ($tipo) {
