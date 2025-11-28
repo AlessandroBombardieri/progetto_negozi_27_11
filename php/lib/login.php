@@ -9,8 +9,8 @@
             $psw = $_POST['psw'];
             $arr = check_login($email, $psw);
             $esito = $arr[0];
-            $cf = $arr[1]['cf'];
-            $ruolo = $arr[1]['ruolo'];
+            $cf = $arr[1];
+            $ruolo = $arr[2];
             if (!is_null($cf)){
                 $_SESSION['id'] = $cf;
             }
