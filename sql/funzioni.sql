@@ -139,19 +139,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;*/
 
-/* Permette di verificare la validità delle credenziali di login fornite, restituendo il codice fiscale dell'utente qualora risultino valide. */
+/* Permette di verificare la validità delle credenziali di login fornite,
+restituendo il codice fiscale dell'utente ed il suo ruolo qualora risultino valide. */
 CREATE OR REPLACE FUNCTION check_login(
     _email VARCHAR,
     _password VARCHAR
 )
-RETURNS VARCHAR AS $$
-DECLARE
-    _codice_fiscale VARCHAR;
+RETURNS TABLE (
+    _codice_fiscale VARCHAR,
+    _ruolo VARCHAR
+) AS $$
 BEGIN
-    SELECT codice_fiscale INTO _codice_fiscale
+    RETURN QUERY
+    SELECT codice_fiscale, ruolo
     FROM utente
     WHERE email = _email AND password = _password;
-    RETURN _codice_fiscale;
 END;
 $$ LANGUAGE plpgsql;
 

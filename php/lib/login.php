@@ -10,33 +10,26 @@
             $arr = check_login($email, $psw);
             $esito = $arr[0];
             $cf = $arr[1]['id'];
+            $ruolo = $arr[2]['ruolo'];
             if (!is_null($cf)){
                 $_SESSION['id'] = $cf;
             }
             $_SESSION['feedback'] = $esito;
-            
-            redirect('../manager/home.php');
-            /*if ($esito) {
-                switch ($tipo) {
-                    case 'studente':
-                        redirect('../studente/home.php');
+            if ($esito) {
+                switch ($ruolo) {
+                    case 'manager':
+                        redirect('../manager/home.php');
                         break;
-                    case 'docente':
-                        redirect('../docente/home.php');
-                        break;
-                    case 'segretario':
-                        redirect('../segreteria/home.php');
-                        break;
-                    case 'ex_studente':
-                        redirect('../ex_studente/home.php');
-                        break;
+                    /*case 'utente':
+                        redirect('../utente/home.php');
+                        break;*/
                     default:
                         redirect('../index.php');
                         break;
                 }
             }else{
                 redirect('../index.php');
-            }*/
+            }
         }else{
             print('I campi non possono essere vuoti');
         }
