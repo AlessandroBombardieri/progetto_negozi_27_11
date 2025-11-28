@@ -186,6 +186,38 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi ad un utente identificato tramite codice fiscale. */
+CREATE OR REPLACE FUNCTION get_utente_by_codice_fiscale(_codice_fiscale VARCHAR)
+RETURNS TABLE (
+    codice_fiscale VARCHAR,
+    email VARCHAR,
+    ruolo VARCHAR,
+    password VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    provincia VARCHAR,
+    citta VARCHAR,
+    via VARCHAR,
+    civico VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.email,
+        u.password,
+        u.manager,
+        u.nome,
+        u.cognome,
+        u.provincia,
+        u.citta,
+        u.via,
+        u.civico
+    FROM utente u
+    WHERE u.codice_fiscale = _codice_fiscale;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi ad un utente identificato tramite email. */
 CREATE OR REPLACE FUNCTION get_utente_by_email(_email VARCHAR)
 RETURNS TABLE (

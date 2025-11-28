@@ -1,5 +1,6 @@
 <?php
 /**
+ * C
  * Redirect tra le pagine php.
  */
 function redirect($url, $permanent = false) {
@@ -8,6 +9,7 @@ function redirect($url, $permanent = false) {
 }
 
 /**
+ * C
  * Debug (temporaneo).
  */
 function parseError($error) {
@@ -20,6 +22,7 @@ function parseError($error) {
 }
 
 /**
+ * C
  * Apre la connessione con il server db.
  */
 function open_pg_connection(){
@@ -29,6 +32,7 @@ function open_pg_connection(){
 }
 
 /**
+ * C
  * Chiude la connessione con il server db.
  */
 function close_pg_connection($db){
@@ -36,9 +40,10 @@ function close_pg_connection($db){
 }
 
 /**
- * Controlla il login (email e password).
+ * M
+ * Verifica il login tramite email e password.
  * 
- * Restituisce un flag true, il codice fiscale dell'utente ed il suo ruolo se il login è andato correttamente, altrimenti false.
+ * Restituisce un flag true, il codice fiscale dell'utente ed il suo ruolo se il login ha avuto esito positivo, altrimenti false.
  */
 function check_login($usr, $psw){
     $db = open_pg_connection();
@@ -60,4 +65,18 @@ function check_login($usr, $psw){
     } else{
         return array(false, null, null);
     }
+}
+
+/**
+ * M
+ * Restituisce le credenziali dell'utente dato il codice fiscale.
+ */
+function get_utente_by_codice_fiscale($cf){
+    $db = open_pg_connection();
+    $params = array($cf);
+    $sql = "SELECT * FROM get_utente_by_codice_fiscale($1)";
+    $result = pg_prepare($db, 'credenziali', $sql);
+    $result = pg_execute($db, 'credenziali', $params);
+    close_pg_connection($db);
+    return pg_fetch_assoc($result);
 }
