@@ -38,7 +38,7 @@ function close_pg_connection($db){
 /**
  * Controlla il login (email e password).
  * 
- * Restituisce un flag true ed il codice fiscale dell'utente se il login è andato correttamente, altrimenti false.
+ * Restituisce un flag true, il codice fiscale dell'utente ed il suo ruolo se il login è andato correttamente, altrimenti false.
  */
 function check_login($usr, $psw){
     $db = open_pg_connection();
@@ -46,12 +46,16 @@ function check_login($usr, $psw){
     $sql = "SELECT * FROM check_login($1, $2)";
     $result = pg_prepare($db, 'login', $sql);
     $result = pg_execute($db, 'login', $params);
-    close_pg_connection($db);
     $row = pg_fetch_assoc($result);
-    $cf = $row['_codice_fiscale'];
-    $ruolo = $row($result)['_ruolo'];
-    if ($cf && $ruolo) return array(true, $cf, $ruolo);
-    else return array(false, null, null);
+    close_pg_connection($db);
+    if ($row) {
+        $cf = $row['_codice_fiscale'];
+        $ruolo = $row['_ruolo'];
+        return array(true, $cf, $ruolo);
+        //if ($cf && $ruolo) return array(true, $cf, $ruolo);
+    }else {
+        return array(false, null, null);
+    }
     /*if ($id = pg_fetch_assoc($result)) return array(true, $id); // trovato il record
     else return array(false, null);*/
 }
