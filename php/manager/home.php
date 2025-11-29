@@ -49,7 +49,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Clienti</h5>
                         <p class="card-text text-muted">Visualizza e crea utenti cliente.</p>
-                        <a class="btn btn-outline-primary" href="clienti/index.php">Gestisci clienti</a>
+                        <a class="btn btn-outline-primary" href="clienti/home.php">Gestisci clienti</a>
                     </div>
                 </div>
             </div>

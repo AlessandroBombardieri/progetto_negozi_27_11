@@ -69,7 +69,7 @@ function check_login($usr, $psw){
 function get_utente_by_codice_fiscale($cf){
     $db = open_pg_connection();
     $params = array($cf);
-    $sql = "SELECT * FROM get_utente_by_codice_fiscale($1)";
+    $sql = "SELECT * FROM get_utente_by_codice_fiscale($1);";
     $result = pg_prepare($db, 'credenziali', $sql);
     $result = pg_execute($db, 'credenziali', $params);
     close_pg_connection($db);
@@ -88,4 +88,36 @@ function change_password($cf, $oldpw, $newpw){
     $result = @pg_execute($db, 'change_pw', $params);
     close_pg_connection($db);
     return $result;
+}
+
+/**
+ * M
+ * Restituisce tutti i clienti.
+ */
+function get_all_clienti(): array {
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_all_clienti();";
+    $result = pg_prepare($db, 'list_clienti', $sql);
+    $result = pg_execute($db, 'list_clienti', array());
+    close_pg_connection($db);
+    $clienti = array();
+    while($row = pg_fetch_assoc($result)){
+        $codice_fiscale = $row['codice_fiscale'];
+        $email = $row['email'];
+        $ruolo = $row['ruolo'];
+        $nome = $row['nome'];
+        $cognome = $row['cognome'];
+        $provincia = $row['provincia'];
+        $citta = $row['citta'];
+        $via = $row['via'];
+        $civico = $row['civico'];
+        $cliente = array($codice_fiscale, $email, $nome, $cognome, $email, $provincia, $citta, $via, $civico);
+        array_push($clienti, $cliente);
+    }
+    return $clienti;
+    //if (!$result) throw new Exception("execute visualizza_utenti");
+    /*$out = [];
+    while ($row = pg_fetch_assoc($result)) $out[] = $row;
+    pg_free_result($result);
+    return $out;*/
 }

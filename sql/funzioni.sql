@@ -182,7 +182,39 @@ BEGIN
         u.citta,
         u.via,
         u.civico
-    FROM utente AS u;
+    FROM utente AS u
+    ORDER BY u.cognome, u.nome;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi a tutti i clienti. */
+CREATE OR REPLACE FUNCTION get_all_clienti()
+RETURNS TABLE (
+    codice_fiscale VARCHAR,
+    email VARCHAR,
+    ruolo VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    provincia VARCHAR,
+    citta VARCHAR,
+    via VARCHAR,
+    civico VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.email,
+        u.ruolo,
+        u.nome,
+        u.cognome,
+        u.provincia,
+        u.citta,
+        u.via,
+        u.civico
+    FROM utente AS u
+    WHERE u.ruolo = 'cliente'
+    ORDER BY u.cognome, u.nome;
 END;
 $$ LANGUAGE plpgsql;
 
