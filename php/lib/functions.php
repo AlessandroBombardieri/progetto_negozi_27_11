@@ -114,3 +114,18 @@ function get_all_clienti(): array
     close_pg_connection($db);
     return $clienti;
 }
+
+/**
+ * M
+ * Crea un nuovo cliente.
+ */
+function add_cliente($cf, $email, $password, $nome, $cognome, $provincia, $citta, $indirizzo, $civico)
+{
+    $db = open_pg_connection();
+    $params = array($cf, $email, $password, $nome, $cognome, $provincia, $citta, $indirizzo, $civico);
+    $sql = "CALL add_cliente($1, $2, $3, $4, $5, $6, $7, $8, $9);";
+    $result = pg_prepare($db, 'add_cliente', $sql);
+    $result = @pg_execute($db, 'add_cliente', $params);
+    close_pg_connection($db);
+    return $result;
+}

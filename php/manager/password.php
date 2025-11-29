@@ -7,7 +7,7 @@ if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
 $u = $_SESSION['utente'];
-$msg = $err = null;
+$ok = $err = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $old_pw = $_POST['old_pw'];
     $new_pw = $_POST['new_pw'];
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$err) {
         $cf = $u['codice_fiscale'];
         if (change_password($cf, $old_pw, $new_pw)) {
-            $msg = "Password aggiornata con successo";
+            $ok = "Password aggiornata con successo";
         } else {
             $err = "Password inserita non corretta";
         }
@@ -48,8 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1 class="h4 mb-0">Cambia password</h1>
             <a class="btn btn-outline-secondary" href="home.php">← Home manager</a>
         </div>
-        <?php if ($msg): ?>
-            <div class="alert alert-success"><?= $msg ?></div><?php endif; ?>
+        
+        <?php if ($ok): ?>
+            <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 

@@ -25,7 +25,7 @@ $rows = get_all_clienti();
             <h1 class="h4 mb-0">Clienti</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="nuovo.php">Nuovo cliente</a>
+                <a class="btn btn-success" href="crea_cliente.php">Nuovo cliente</a>
             </div>
         </div>
 

@@ -103,8 +103,26 @@ CREATE OR REPLACE PROCEDURE add_utente(
     _civico VARCHAR
 ) AS $$
 BEGIN
-    INSERT INTO utente(codice_fiscale, email, password, manager, nome, cognome, provincia, citta, via, civico)
-    VALUES (_codice_fiscale, _email, _password, _manager, _nome, _cognome, _provincia, _citta, _via, _civico);
+    INSERT INTO utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico)
+    VALUES (_codice_fiscale, _email, _password, _ruolo, _nome, _cognome, _provincia, _citta, _via, _civico);
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di creare un nuovo cliente. */
+CREATE OR REPLACE PROCEDURE add_cliente(
+    _codice_fiscale VARCHAR,
+    _email VARCHAR,
+    _password VARCHAR,
+    _nome VARCHAR,
+    _cognome VARCHAR,
+    _provincia VARCHAR,
+    _citta VARCHAR,
+    _via VARCHAR,
+    _civico VARCHAR
+) AS $$
+BEGIN
+    INSERT INTO utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico)
+    VALUES (_codice_fiscale, _email, _password, 'cliente', _nome, _cognome, _provincia, _citta, _via, _civico);
 END;
 $$ LANGUAGE plpgsql;
 
