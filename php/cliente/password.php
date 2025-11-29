@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="h4 mb-0">Cambia password</h1>
-            <a class="btn btn-outline-secondary" href="home.php">← Home manager</a>
+            <a class="btn btn-outline-secondary" href="home.php">← Home cliente</a>
         </div>
         <?php if ($msg): ?>
             <div class="alert alert-success"><?= $msg ?></div><?php endif; ?>

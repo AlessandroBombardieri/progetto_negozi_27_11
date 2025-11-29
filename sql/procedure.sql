@@ -71,13 +71,15 @@ CREATE OR REPLACE PROCEDURE change_password(
     _nuova_password VARCHAR
 ) AS $$
 DECLARE
-    match BOOLEAN := FALSE;
+    count INT;
 BEGIN
-    SELECT TRUE INTO match
+    -- Controllo esplicito: quante righe corrispondono a CF + vecchia password
+    SELECT COUNT(*)
+    INTO count
     FROM utente
     WHERE codice_fiscale = _codice_fiscale AND password = _vecchia_password;
     -- Se l'utente non viene trovato oppure la vecchia password inserita non corrisponde allora segnala errore.
-    IF NOT match THEN
+    IF count = 0 THEN
         RAISE EXCEPTION 'Password inserita errata';
     END IF;
     -- Aggiorna la password dell'utente con la nuova da lui scelta.
