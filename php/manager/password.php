@@ -31,19 +31,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!doctype html>
 <html lang="en">
 
-</html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cambia password</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="h4 mb-0">Cambia password</h1>
-            <a class="btn btn-outline-secondary" href="home.php">← Home manager</a>
+            <a class="btn btn-outline-secondary" href="index.php">← Home manager</a>
         </div>
-
         <?php if ($msg): ?>
             <div class="alert alert-success"><?= $msg ?></div><?php endif; ?>
         <?php if ($err): ?>

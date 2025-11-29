@@ -76,6 +76,10 @@ function get_utente_by_codice_fiscale($cf){
     return pg_fetch_assoc($result);
 }
 
+/**
+ * M
+ * Cambia la password dell'utente dato il codice fiscale, la vecchia password e la nuova password.
+ */
 function change_password($cf, $oldpw, $newpw){
     $db = open_pg_connection();
     $params = array($cf, $oldpw, $newpw); 
