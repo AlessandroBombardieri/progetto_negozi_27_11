@@ -48,19 +48,19 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Clienti</h5>
-                        <p class="card-text text-muted">Visualizza e crea utenti cliente.</p>
+                        <p class="card-text text-muted">Visualizza e crea utenze cliente.</p>
                         <a class="btn btn-outline-primary" href="clienti/home.php">Gestisci clienti</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Prodotti -->
+            <!-- Tessere -->
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Prodotti</h5>
-                        <p class="card-text text-muted">Elenco globale dei prodotti.</p>
-                        <a class="btn btn-outline-primary" href="prodotti/index.php">Vedi prodotti</a>
+                        <h5 class="card-title">Tessere</h5>
+                        <p class="card-text text-muted">Associa tessere a clienti/negozi.</p>
+                        <a class="btn btn-outline-primary" href="tessere/index.php">Gestisci tessere</a>
                     </div>
                 </div>
             </div>
@@ -73,8 +73,6 @@ $u = $_SESSION['utente'];
                         <p class="card-text text-muted">Inserisci, chiudi e gestisci i negozi della catena.</p>
                         <div class="d-grid gap-2 d-md-block">
                             <a class="btn btn-outline-primary me-1 mb-1" href="negozi/index.php">Gestisci negozi</a>
-                            <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Nuovo ordine
-                                (rifornisci)</a>
                         </div>
                     </div>
                 </div>
@@ -91,28 +89,38 @@ $u = $_SESSION['utente'];
                 </div>
             </div>
 
+            <!-- Prodotti -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Prodotti</h5>
+                        <p class="card-text text-muted">Elenco globale dei prodotti.</p>
+                        <a class="btn btn-outline-primary" href="prodotti/index.php">Gestisci prodotti</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ordini -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Rifornisci</h5>
+                        <p class="card-text text-muted">Rifornisci un negozio della catena.</p>
+                        <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Nuovo ordine</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Fatture -->
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Fatture</h5>
                         <p class="card-text text-muted">Storici per cliente/prodotto/negozio.</p>
-                        <a class="btn btn-outline-primary" href="fatture/index.php">Vedi fatture</a>
+                        <a class="btn btn-outline-primary" href="fatture/index.php">Gestisci fatture</a>
                     </div>
                 </div>
             </div>
-
-            <!-- Tessere -->
-            <div class="col-sm-6 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Tessere</h5>
-                        <p class="card-text text-muted">Associa tessere a clienti/negozi.</p>
-                        <a class="btn btn-outline-primary" href="tessere/index.php">Gestisci tessere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="mt-4"><a href="../logout.php">Logout</a></div>
     </div>

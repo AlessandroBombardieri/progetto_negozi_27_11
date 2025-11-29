@@ -3,7 +3,8 @@
  * C
  * Redirect tra le pagine php.
  */
-function redirect($url, $permanent = false) {
+function redirect($url, $permanent = false)
+{
     header("Location: $url", true, $permanent ? 301 : 302);
     exit();
 }
@@ -12,7 +13,8 @@ function redirect($url, $permanent = false) {
  * C
  * Debug (temporaneo).
  */
-function parseError($error) {
+function parseError($error)
+{
     $startPos = strpos($error, "ERROR:");
     $endPos1 = strpos($error, "DETAIL"); // end position for "default" errors
     $endPos2 = strpos($error, "CONTEX"); // end position for custom trigger exceptions
@@ -25,9 +27,10 @@ function parseError($error) {
  * C
  * Apre la connessione con il server db.
  */
-function open_pg_connection(){
-    include_once('../conf/conf.php');
-    $conn = "host=".DB_HOST." dbname=".DB_NAME." user=".DB_USER." password=".DB_PASS;
+function open_pg_connection()
+{
+    include_once(__DIR__ . '/../conf/conf.php');
+    $conn = "host=" . DB_HOST . " dbname=" . DB_NAME . " user=" . DB_USER . " password=" . DB_PASS;
     return pg_connect($conn);
 }
 
@@ -35,7 +38,8 @@ function open_pg_connection(){
  * C
  * Chiude la connessione con il server db.
  */
-function close_pg_connection($db){
+function close_pg_connection($db)
+{
     return pg_close($db);
 }
 
@@ -45,7 +49,8 @@ function close_pg_connection($db){
  * 
  * Restituisce un flag true, il codice fiscale dell'utente ed il suo ruolo se il login ha avuto esito positivo, altrimenti false.
  */
-function check_login($usr, $psw){
+function check_login($usr, $psw)
+{
     $db = open_pg_connection();
     $params = array($usr, $psw);
     $sql = "SELECT * FROM check_login($1, $2)";
@@ -57,8 +62,8 @@ function check_login($usr, $psw){
         $cf = $row['_codice_fiscale'];
         $ruolo = $row['_ruolo'];
         return array(true, $cf, $ruolo);
-        }else {
-            return array(false, null, null);
+    } else {
+        return array(false, null, null);
     }
 }
 
@@ -66,7 +71,8 @@ function check_login($usr, $psw){
  * M
  * Restituisce le credenziali dell'utente dato il codice fiscale.
  */
-function get_utente_by_codice_fiscale($cf){
+function get_utente_by_codice_fiscale($cf)
+{
     $db = open_pg_connection();
     $params = array($cf);
     $sql = "SELECT * FROM get_utente_by_codice_fiscale($1);";
@@ -80,9 +86,10 @@ function get_utente_by_codice_fiscale($cf){
  * M
  * Cambia la password dell'utente dato il codice fiscale, la vecchia password e la nuova password.
  */
-function change_password($cf, $oldpw, $newpw){
+function change_password($cf, $oldpw, $newpw)
+{
     $db = open_pg_connection();
-    $params = array($cf, $oldpw, $newpw); 
+    $params = array($cf, $oldpw, $newpw);
     $sql = "CALL change_password($1, $2, $3);";
     $result = pg_prepare($db, 'change_pw', $sql);
     $result = @pg_execute($db, 'change_pw', $params);
@@ -94,30 +101,16 @@ function change_password($cf, $oldpw, $newpw){
  * M
  * Restituisce tutti i clienti.
  */
-function get_all_clienti(): array {
+function get_all_clienti(): array
+{
     $db = open_pg_connection();
     $sql = "SELECT * FROM get_all_clienti();";
     $result = pg_prepare($db, 'list_clienti', $sql);
     $result = pg_execute($db, 'list_clienti', array());
-    close_pg_connection($db);
-    $clienti = array();
-    while($row = pg_fetch_assoc($result)){
-        $codice_fiscale = $row['codice_fiscale'];
-        $email = $row['email'];
-        $ruolo = $row['ruolo'];
-        $nome = $row['nome'];
-        $cognome = $row['cognome'];
-        $provincia = $row['provincia'];
-        $citta = $row['citta'];
-        $via = $row['via'];
-        $civico = $row['civico'];
-        $cliente = array($codice_fiscale, $email, $nome, $cognome, $email, $provincia, $citta, $via, $civico);
-        array_push($clienti, $cliente);
+    $clienti = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $clienti[] = $row;
     }
+    close_pg_connection($db);
     return $clienti;
-    //if (!$result) throw new Exception("execute visualizza_utenti");
-    /*$out = [];
-    while ($row = pg_fetch_assoc($result)) $out[] = $row;
-    pg_free_result($result);
-    return $out;*/
 }

@@ -34,20 +34,26 @@ $rows = get_all_clienti();
                 <thead class="table-light">
                     <tr>
                         <th>CF</th>
+                        <th>Email</th>
                         <th>Nome</th>
                         <th>Cognome</th>
-                        <th>Email</th>
+                        <th>Provincia</th>
                         <th>Città</th>
+                        <th>Via</th>
+                        <th>Civico</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $r): ?>
                         <tr>
                             <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
+                            <td><?= htmlspecialchars($r['email']) ?></td>
                             <td><?= htmlspecialchars($r['nome']) ?></td>
                             <td><?= htmlspecialchars($r['cognome']) ?></td>
-                            <td><?= htmlspecialchars($r['email']) ?></td>
+                            <td><?= htmlspecialchars($r['provincia']) ?></td>
                             <td><?= htmlspecialchars($r['citta']) ?></td>
+                            <td><?= htmlspecialchars($r['via']) ?></td>
+                            <td><?= htmlspecialchars($r['civico']) ?></td>
                         </tr>
                     <?php endforeach;
                     if (!$rows): ?>
