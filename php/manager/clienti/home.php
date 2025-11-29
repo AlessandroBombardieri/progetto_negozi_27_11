@@ -10,7 +10,7 @@ if (!isset($_SESSION['utente'])) {
 $rows = get_all_clienti();
 ?>
 <!doctype html>
-<html lang="it">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
