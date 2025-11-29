@@ -24,7 +24,6 @@ $u = $_SESSION['utente'];
             <h1 class="h4 mb-0">Area Manager</h1>
             <div class="text-muted small">
                 <?php
-                // Non funziona!!
                 echo htmlspecialchars($u['nome']) . ' ' .
                     htmlspecialchars($u['cognome']) . ' — ' .
                     htmlspecialchars($u['email']);

@@ -36,7 +36,7 @@ if (isset($_POST)) {
                     redirect('../utente/home.php');
                     break;*/
                 default:
-                    redirect('../index.php');
+                    redirect('../cliente/home.php');
                     break;
             }
         } else {

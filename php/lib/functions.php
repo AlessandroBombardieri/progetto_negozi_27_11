@@ -75,3 +75,13 @@ function get_utente_by_codice_fiscale($cf){
     close_pg_connection($db);
     return pg_fetch_assoc($result);
 }
+
+function change_password($cf, $oldpw, $newpw){
+    $db = open_pg_connection();
+    $params = array($cf, $oldpw, $newpw); 
+    $sql = "CALL change_password($1, $2, $3);";
+    $result = pg_prepare($db, 'credenziali', $sql);
+    $result = pg_execute($db, 'credenziali', $params);
+    close_pg_connection($db);
+    return $result;
+}
