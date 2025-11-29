@@ -53,17 +53,12 @@ function check_login($usr, $psw){
     $result = pg_execute($db, 'login', $params);
     $row = pg_fetch_assoc($result);
     close_pg_connection($db);
-    /*if ($row) {
+    if ($row) {
         $cf = $row['_codice_fiscale'];
         $ruolo = $row['_ruolo'];
         return array(true, $cf, $ruolo);
         }else {
             return array(false, null, null);
-    }*/
-    if ($cf = $row['_codice_fiscale'] && $ruolo = $row['_ruolo']) {
-        return array(true, $cf, $ruolo);
-    } else{
-        return array(false, null, null);
     }
 }
 

@@ -3,77 +3,120 @@ ini_set("display_errors", "On");
 ini_set("error_reporting", E_ALL);
 include_once('../lib/functions.php');
 session_start();
-if (!isset($_SESSION['id'])) {
+if (!isset($_SESSION['utente'])) {
     redirect('../index.php');
 }
-$arr = get_utente_by_codice_fiscale($_SESSION['id']);
-$nome = $arr['nome'];
-$cognome = $arr['cognome'];
-$email = $arr['email'];
-$nome_completo = $nome . ' ' . $cognome;
+$u = $_SESSION['utente'];
 ?>
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home Manager</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/esami.css">
+    <title>Area Manager</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="container-fluid">
-        <?php include_once("navbar.php"); ?>
-        <h3>Benvenuto/a manager "<?php echo $nome_completo ?>" (<?php echo $email ?>)</h3>
-        <p>Naviga con la navbar oppure seleziona l'azione di interesse</p>
-        <br>
-        <div class="row">
-            <div class="col-12">
-                <div class="card-body">
-                    <a href="visualizzainsegnamenti.php">
-                        <h2 class="card-text">Visualizza insegnamenti</h2>
-                    </a>
-                    <p>Gli insegnamenti di cui il docente e' responsabile</p>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 mb-0">Area Manager</h1>
+            <div class="text-muted small">
+                <?php
+                // Non funziona!!
+                echo htmlspecialchars($u['nome']) . ' ' .
+                    htmlspecialchars($u['cognome']) . ' — ' .
+                    htmlspecialchars($u['email']);
+                ?>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <!-- Account -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Account</h5>
+                        <p class="card-text text-muted">Gestisci la tua password.</p>
+                        <a class="btn btn-outline-primary" href="password.php">Cambia password</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clienti -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Clienti</h5>
+                        <p class="card-text text-muted">Visualizza e crea utenti cliente.</p>
+                        <a class="btn btn-outline-primary" href="clienti/index.php">Gestisci clienti</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prodotti -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Prodotti</h5>
+                        <p class="card-text text-muted">Elenco globale dei prodotti.</p>
+                        <a class="btn btn-outline-primary" href="prodotti/index.php">Vedi prodotti</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Negozi -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Negozi</h5>
+                        <p class="card-text text-muted">Inserisci, chiudi e gestisci i negozi della catena.</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a class="btn btn-outline-primary me-1 mb-1" href="negozi/index.php">Gestisci negozi</a>
+                            <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Nuovo ordine
+                                (rifornisci)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fornitori -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Fornitori</h5>
+                        <p class="card-text text-muted">Elenco e cataloghi fornitori.</p>
+                        <a class="btn btn-outline-primary" href="fornitori/index.php">Gestisci fornitori</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fatture -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Fatture</h5>
+                        <p class="card-text text-muted">Storici per cliente/prodotto/negozio.</p>
+                        <a class="btn btn-outline-primary" href="fatture/index.php">Vedi fatture</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tessere -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Tessere</h5>
+                        <p class="card-text text-muted">Associa tessere a clienti/negozi.</p>
+                        <a class="btn btn-outline-primary" href="tessere/index.php">Gestisci tessere</a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card-body">
-                    <a href="inserisciappelli.php">
-                        <h2 class="card-text">Crea appello</h2>
-                    </a>
-                    <p>Crea un appello per un tuo insegnamento di cui sei responsabile</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card-body">
-                    <a href="calendarioesami.php">
-                        <h2 class="card-text">Visualizza appelli</h2>
-                    </a>
-                    <p>Visualizza gli appelli di cui sei responsabile</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card-body">
-                    <a href="registraesiti.php">
-                        <h2 class="card-text">Registra voto/esito</h2>
-                    </a>
-                    <p>Registra un voto di un esame di uno studente iscritto</p>
-                </div>
-            </div>
-        </div>
+
+        <div class="mt-4"><a href="../logout.php">Logout</a></div>
     </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
 
 </html>
