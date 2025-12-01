@@ -255,6 +255,9 @@ CREATE OR REPLACE PROCEDURE update_quantita_prodotto_as_fornitore(
     _quantita INT
 ) AS $$
 BEGIN
+    IF _quantita < 0 THEN
+        RAISE EXCEPTION 'La quantità da aggiungere non può essere negativa';
+    END IF;
     UPDATE venduto_da
     SET quantita = quantita + _quantita
     WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;

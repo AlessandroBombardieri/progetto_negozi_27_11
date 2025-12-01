@@ -248,3 +248,33 @@ function add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $qua
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Incrementa le scorte di un prodotto in vendita presso un dato fornitore.
+ */
+function update_quantita_prodotto_as_fornitore($partita_iva, $codice_prodotto, $quantita)
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva, $codice_prodotto, $quantita);
+    $sql = "CALL update_quantita_prodotto_as_fornitore($1, $2, $3);";
+    $result = pg_prepare($db, 'update_quantita_prodotto_as_fornitore', $sql);
+    $result = @pg_execute($db, 'update_quantita_prodotto_as_fornitore', $params);
+    close_pg_connection($db);
+    return $result;
+}
+
+/**
+ * M
+ * Modifica il prezzo di un prodotto in vendita presso un dato fornitore.
+ */
+function update_prezzo_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo)
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva, $codice_prodotto, $prezzo);
+    $sql = "CALL update_prezzo_prodotto_as_fornitore($1, $2, $3);";
+    $result = pg_prepare($db, 'update_prezzo_prodotto_as_fornitore', $sql);
+    $result = @pg_execute($db, 'update_prezzo_prodotto_as_fornitore', $params);
+    close_pg_connection($db);
+    return $result;
+}

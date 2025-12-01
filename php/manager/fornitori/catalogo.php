@@ -59,14 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
                             <td><?= htmlspecialchars($r['prezzo']) ?></td>
                             <td><?= htmlspecialchars($r['quantita']) ?></td>
                             <td class="text-end">
-                                <form method="post" action="update_scorte.php" class="d-inline">
+                                <form method="post" action="update_scorte_prodotto.php" class="d-inline">
                                     <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                                    <input type="hidden" name="codice_prodotto" value="<?= htmlspecialchars($r['codice_prodotto']) ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-primary">
                                         Incrementa scorte
                                     </button>
                                 </form>
-                                <form method="post" action="update_prezzo.php" class="d-inline">
+                                <form method="post" action="update_prezzo_prodotto.php" class="d-inline">
                                     <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                                    <input type="hidden" name="codice_prodotto" value="<?= htmlspecialchars($r['codice_prodotto']) ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-primary">
                                         Modifica prezzo
                                     </button>
