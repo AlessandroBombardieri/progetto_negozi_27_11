@@ -342,6 +342,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi a tutti i fornitori. */
+CREATE OR REPLACE FUNCTION get_all_fornitori()
+RETURNS TABLE (
+    partita_iva VARCHAR,
+    indirizzo VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT f.partita_iva, f.indirizzo
+    FROM fornitore f;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi agli ordini effettuati da parte di un negozio. */
 CREATE OR REPLACE FUNCTION get_ordini_by_negozio(_codice_negozio UUID)
 RETURNS TABLE (

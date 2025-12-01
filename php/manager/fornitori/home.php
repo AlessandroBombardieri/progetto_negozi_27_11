@@ -6,7 +6,7 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
-$rows = get_all_clienti();
+$rows = get_all_fornitori();
 ?>
 
 <!doctype html>
@@ -22,10 +22,10 @@ $rows = get_all_clienti();
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Clienti</h1>
+            <h1 class="h4 mb-0">Fornitori</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="new_cliente.php">Nuovo cliente</a>
+                <a class="btn btn-success" href="new_fornitore.php">Nuovo fornitore</a>
             </div>
         </div>
 
@@ -33,32 +33,25 @@ $rows = get_all_clienti();
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>CF</th>
-                        <th>Email</th>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Provincia</th>
-                        <th>Città</th>
-                        <th>Via</th>
-                        <th>Civico</th>
+                        <th>Partita IVA</th>
+                        <th>Indirizzo</th>
+                        <th class="text-end">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $r): ?>
                         <tr>
-                            <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
-                            <td><?= htmlspecialchars($r['email']) ?></td>
-                            <td><?= htmlspecialchars($r['nome']) ?></td>
-                            <td><?= htmlspecialchars($r['cognome']) ?></td>
-                            <td><?= htmlspecialchars($r['provincia']) ?></td>
-                            <td><?= htmlspecialchars($r['citta']) ?></td>
-                            <td><?= htmlspecialchars($r['via']) ?></td>
-                            <td><?= htmlspecialchars($r['civico']) ?></td>
+                            <td><?= htmlspecialchars($r['partita_iva']) ?></td>
+                            <td><?= htmlspecialchars($r['indirizzo']) ?></td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary"
+                                    href="catalogo.php?piva=<?= urlencode($r['partita_iva']) ?>">Gestisci prodotti</a>
+                            </td>
                         </tr>
                     <?php endforeach;
                     if (!$rows): ?>
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Nessun cliente</td>
+                            <td colspan="5" class="text-center text-muted py-4">Nessun fornitore</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

@@ -68,29 +68,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 
-        <form method="post" class="row g-3 card p-3 shadow-sm">
+        <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4"><label class="form-label">Codice Fiscale</label><input name="codice_fiscale"
-                    class="form-control" maxlength="16" required></div>
+                    class="form-control" maxlength="16" required></div><br>
             <div class="col-md-4"><label class="form-label">Email</label><input name="email" type="email"
-                    class="form-control" required></div>
+                    class="form-control" required></div><br>
             <div class="col-md-4"><label class="form-label">Password</label><input name="password" type="password"
-                    class="form-control" maxlength="20" required></div>
+                    class="form-control" maxlength="20" required></div><br>
             <div class="col-md-4"><label class="form-label">Nome</label><input name="nome" class="form-control"
-                    required></div>
+                    required></div><br>
             <div class="col-md-4"><label class="form-label">Cognome</label><input name="cognome" class="form-control"
-                    required></div>
+                    required></div><br>
             <div class="col-md-4"><label class="form-label">Provincia</label><input name="provincia"
-                    class="form-control" required></div>
+                    class="form-control" required></div><br>
             <div class="col-md-4"><label class="form-label">Città</label><input name="citta" class="form-control"
-                    required></div>
-            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control" required>
-            </div>
+                    required></div><br>
+            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control"
+                    required></div><br>
             <div class="col-md-1"><label class="form-label">Civico</label><input name="civico" class="form-control"
-                    maxlength="3" required></div>
-
+                    maxlength="3" required></div><br>
             <div class="col-12">
-                <button class="btn btn-success">Crea</button>
-            </div>
+                <button class="btn btn-success">Crea</button></div>
         </form>
     </div>
 </body>

@@ -25,7 +25,7 @@ $rows = get_all_prodotti();
             <h1 class="h4 mb-0">Prodotti</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="crea_prodotto.php">Nuovo prodotto</a>
+                <a class="btn btn-success" href="new_prodotto.php">Nuovo prodotto</a>
             </div>
         </div>
 

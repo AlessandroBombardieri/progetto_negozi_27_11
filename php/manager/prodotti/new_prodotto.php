@@ -52,12 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 
-        <form method="post" class="row g-3 card p-3 shadow-sm">
-            <div class="col-md-4"><label class="form-label">Nome</label><input name="nome"
-                    class="form-control" required></div>
-            <div class="col-md-6"><label class="form-label">Descrizione</label><input name="descrizione"
-                    class="form-control" required></div>
-            <div class="col-12">
+        <form method="post" class="card p-3 shadow-sm">
+            <div class="col-md-4">
+                <label class="form-label">Nome</label>
+                <input name="nome" class="form-control" required>
+            </div><br>
+            <div class="mb-3">
+                <label class="form-label">Descrizione</label>
+                <textarea name="descrizione" class="form-control" rows="4" maxlength="200"></textarea>
+            </div>
+            <div class="d-flex gap-2">
                 <button class="btn btn-success">Crea</button>
             </div>
         </form>

@@ -162,3 +162,55 @@ function add_prodotto($nome, $descrizione)
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Restituisce tutti i fornitori.
+ */
+function get_all_fornitori(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_all_fornitori();";
+    $result = pg_prepare($db, 'list_fornitori', $sql);
+    $result = pg_execute($db, 'list_fornitori', array());
+    $fornitori = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $fornitori[] = $row;
+    }
+    close_pg_connection($db);
+    return $fornitori;
+}
+
+/**
+ * M
+ * Crea un nuovo fornitore.
+ */
+function add_fornitore($partita_iva, $indirizzo)
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva, $indirizzo);
+    $sql = "CALL add_fornitore($1, $2);";
+    $result = pg_prepare($db, 'add_fornitore', $sql);
+    $result = @pg_execute($db, 'add_fornitore', $params);
+    close_pg_connection($db);
+    return $result;
+}
+
+/**
+ * M
+ * Restituisce tutti i prodotti a catalogo presso un dato fornitore.
+ */
+function get_prodotti_by_fornitore($partita_iva)
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva);
+    $sql = "SELECT * FROM get_prodotti_by_fornitore($1);";
+    $result = pg_prepare($db, 'prodotti', $sql);
+    $result = pg_execute($db, 'prodotti', $params);
+    $prodotti = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $orodotti[] = $row;
+    }
+    close_pg_connection($db);
+    return $prodotti;
+}
