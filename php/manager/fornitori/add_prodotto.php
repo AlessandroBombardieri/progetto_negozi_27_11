@@ -7,6 +7,8 @@ if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
 
+var_dump($_POST);
+
 $ok = $err = null;
 $prodotti_disponibili = [];
 $partita_iva = '';
