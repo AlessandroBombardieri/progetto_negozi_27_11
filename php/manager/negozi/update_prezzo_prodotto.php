@@ -9,7 +9,7 @@ if (!isset($_SESSION['utente'])) {
 $ok = $err = null;
 $codice_negozio = '';
 $codice_prodotto = '';
-if (!empty($_POST['codice_negozio'] && !empty($_POST['codice_prodotto']))) {
+if (!empty($_POST['codice_negozio']) && !empty($_POST['codice_prodotto'])) {
     $codice_negozio = $_POST['codice_negozio'];
     $codice_prodotto = $_POST['codice_prodotto'];
 }

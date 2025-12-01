@@ -222,7 +222,7 @@ CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
     _nuovo_prezzo FLOAT8
 ) AS $$
 BEGIN
-    IF p_nuovo_prezzo < 0 THEN
+    IF _nuovo_prezzo < 0 THEN
         RAISE EXCEPTION 'Prezzo negativo non ammesso';
     END IF;
     UPDATE vende
