@@ -8,23 +8,25 @@ if (!isset($_SESSION['utente'])) {
 }
 $ok = $err = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = $_POST['nome'];
-    $descrizione = $_POST['descrizione'];
+    $indirizzo = $_POST['indirizzo'];
+    $orario_apertura = $_POST['orario_apertura'];
+    $nominativo_responsabile = $_POST['nominativo_responsabile'];
     if (
-        $nome === '' || $descrizione === ''
+        $indirizzo === '' || $orario_apertura === '' || $nominativo_responsabile === ''
     ) {
         $err = "Compila tutti i campi";
     }
     if (!$err) {
         if (
-            add_prodotto(
-                $nome,
-                $descrizione,
+            add_negozio(
+                $indirizzo,
+                $orario_apertura,
+                $nominativo_responsabile
             )
         ) {
-            $ok = "Prodotto creato con successo";
+            $ok = "Negozio creato con successo";
         } else {
-            $err = "Errore creazione prodotto";
+            $err = "Errore creazione negozio";
         }
     }
 }
@@ -35,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <head>
     <meta charset="utf-8">
-    <title>Nuovo prodotto</title>
+    <title>Nuovo negozio</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -43,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Nuovo prodotto</h1>
-            <a class="btn btn-outline-secondary" href="home.php">← Torna a Prodotti</a>
+            <h1 class="h4 mb-0">Nuovo negozio</h1>
+            <a class="btn btn-outline-secondary" href="home.php">← Torna a Negozi</a>
         </div>
 
         <?php if ($ok): ?>
@@ -54,13 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
-                <label class="form-label">Nome</label>
-                <input name="nome" class="form-control" required>
+                <label class="form-label">Indirizzo</label>
+                <input name="indirizzo" class="form-control" required>
             </div><br>
-            <div class="mb-3">
-                <label class="form-label">Descrizione</label>
-                <textarea name="descrizione" class="form-control" rows="4" maxlength="500"></textarea>
-            </div>
+            <div class="col-md-4-3">
+                <label class="form-label">Orario di apertura</label>
+                <textarea name="orario_apertura" class="form-control" rows="3" maxlength="300"></textarea>
+            </div><br>
+            <div class="col-md-4">
+                <label class="form-label">Nominativo responsabile</label>
+                <input name="nominativo_responsabile" class="form-control" required>
+            </div><br>
             <div class="d-flex gap-2">
                 <button class="btn btn-success">Crea</button>
             </div>

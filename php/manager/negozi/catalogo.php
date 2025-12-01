@@ -7,9 +7,9 @@ if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
 $rows = [];
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
-    $partita_iva = $_POST['partita_iva'];
-    $rows = get_prodotti_by_fornitore($partita_iva);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['codice_negozio'])) {
+    $codice_negozio = $_POST['codice_negozio'];
+    $rows = get_prodotti_by_negozio($codice_negozio);
 }
 ?>
 
@@ -28,13 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="h4 mb-0">Prodotti</h1>
             <div>
-                <a class="btn btn-outline-secondary me-2" href="home.php">← Fornitori</a>
-                <!--<a class="btn btn-success" href="add_prodotto.php?partita_iva=<?= htmlspecialchars($partita_iva) ?>">
-                    Aggiungi prodotto
-                </a> -->
-                <form method="post" action="add_prodotto.php" class="d-inline">
-                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
-                    <button class="btn btn-success">Aggiungi prodotto</button>
+                <a class="btn btn-outline-secondary me-2" href="home.php">← Negozi</a>
+                <form method="post" action="ordine.php" class="d-inline">
+                    <input type="hidden" name="codice_negozio" value="<?= htmlspecialchars($codice_negozio) ?>">
+                    <button class="btn btn-success">Nuovo ordine</button>
                 </form>
             </div>
         </div>
@@ -59,15 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
                             <td><?= htmlspecialchars($r['prezzo']) ?></td>
                             <td><?= htmlspecialchars($r['quantita']) ?></td>
                             <td class="text-end">
-                                <form method="post" action="update_scorte_prodotto.php" class="d-inline">
-                                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
-                                    <input type="hidden" name="codice_prodotto" value="<?= htmlspecialchars($r['codice_prodotto']) ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        Incrementa scorte
-                                    </button>
-                                </form>
                                 <form method="post" action="update_prezzo_prodotto.php" class="d-inline">
-                                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                                    <input type="hidden" name="codice_negozio" value="<?= htmlspecialchars($codice_negozio) ?>">
                                     <input type="hidden" name="codice_prodotto" value="<?= htmlspecialchars($r['codice_prodotto']) ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-primary">
                                         Modifica prezzo

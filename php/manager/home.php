@@ -72,7 +72,7 @@ $u = $_SESSION['utente'];
                         <h5 class="card-title">Negozi</h5>
                         <p class="card-text text-muted">Inserisci, chiudi e gestisci i negozi della catena.</p>
                         <div class="d-grid gap-2 d-md-block">
-                            <a class="btn btn-outline-primary me-1 mb-1" href="negozi/index.php">Gestisci negozi</a>
+                            <a class="btn btn-outline-primary me-1 mb-1" href="negozi/home.php">Gestisci negozi</a>
                         </div>
                     </div>
                 </div>
@@ -104,18 +104,7 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Rifornisci</h5>
-                        <p class="card-text text-muted">Rifornisci un negozio della catena.</p>
-                        <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Nuovo ordine</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ordini -->
-            <div class="col-sm-6 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Ordini</h5>
+                        <h5 class="card-title">Storico ordini</h5>
                         <p class="card-text text-muted">Storico ordini effettuati presso fornitori.</p>
                         <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Visualizza storico ordini</a>
                     </div>
@@ -126,7 +115,7 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Fatture</h5>
+                        <h5 class="card-title">Storico fatture</h5>
                         <p class="card-text text-muted">Storici per cliente/prodotto/negozio.</p>
                         <a class="btn btn-outline-primary" href="fatture/index.php">Visualizza storico fatture</a>
                     </div>

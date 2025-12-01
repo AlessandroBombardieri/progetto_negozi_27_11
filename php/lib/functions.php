@@ -278,3 +278,70 @@ function update_prezzo_prodotto_as_fornitore($partita_iva, $codice_prodotto, $pr
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Restituisce tutti i negozi.
+ */
+function get_all_negozi(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_all_negozi();";
+    $result = pg_prepare($db, 'get_all_negozi', $sql);
+    $result = pg_execute($db, 'get_all_negozi', array());
+    $negozi = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $negozi[] = $row;
+    }
+    close_pg_connection($db);
+    return $negozi;
+}
+
+/**
+ * M
+ * Crea un nuovo negozio.
+ */
+function add_negozio($indirizzo, $orario_apertura, $responsabile)
+{
+    $db = open_pg_connection();
+    $params = array($indirizzo, $orario_apertura, $responsabile);
+    $sql = "CALL add_negozio($1, $2, $3);";
+    $result = pg_prepare($db, 'add_negozio', $sql);
+    $result = @pg_execute($db, 'add_negozio', $params);
+    close_pg_connection($db);
+    return $result;
+}
+
+/**
+ * M
+ * Restituisce tutti i prodotti in vendita presso un dato negozio.
+ */
+function get_prodotti_by_negozio(string $codice_negozio): array
+{
+    $db = open_pg_connection();
+    $params = array($codice_negozio);
+    $sql = "SELECT * FROM get_prodotti_by_negozio($1);";
+    $result = pg_prepare($db, 'get_prodotti_by_negozio', $sql);
+    $result = pg_execute($db, 'get_prodotti_by_negozio', $params);
+    $prodotti = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $prodotti[] = $row;
+    }
+    close_pg_connection($db);
+    return $prodotti;
+}
+
+/**
+ * M
+ * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
+ */
+function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
+{
+    $db = open_pg_connection();
+    $params = array($codice_prodotto, $quantita, $codice_negozio);
+    $sql = "SELECT * FROM get_utente_by_codice_fiscale($1);";
+    $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
+    $result = pg_execute($db, 'ordina_prodotto_as_negozio', $params);
+    close_pg_connection($db);
+    return pg_fetch_assoc($result);
+}

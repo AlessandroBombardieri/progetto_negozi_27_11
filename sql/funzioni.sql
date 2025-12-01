@@ -47,9 +47,9 @@ CREATE OR REPLACE FUNCTION ordina_prodotto_as_negozio(
 RETURNS UUID AS $$
 DECLARE
     _partita_iva VARCHAR(11);
-    _prezzo      FLOAT8;
-    _ordine_id   UUID;
-    _totale      FLOAT8;
+    _prezzo FLOAT8;
+    _ordine_id UUID;
+    _totale FLOAT8;
 BEGIN
     -- Determino il fornitore il quale vende il prodotto di interesse in quantità sufficiente al minor prezzo unitario.
     SELECT vd.partita_iva, vd.prezzo
@@ -282,6 +282,27 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi a tutti i negozi. */
+CREATE OR REPLACE FUNCTION get_all_negozi()
+RETURNS TABLE (
+    codice_negozio UUID,
+	indirizzo VARCHAR,
+	orario_apertura VARCHAR,
+	nominativo_responsabile VARCHAR,
+	dismesso BOOL
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        n.codice_negozio,
+        n.indirizzo,
+        n.orario_apertura,
+        n.nominativo_responsabile,
+        n.dismesso
+    FROM negozio n;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi a tutti i prodotti. */
 CREATE OR REPLACE FUNCTION get_all_prodotti()
 RETURNS TABLE (
@@ -291,7 +312,10 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT p.codice_prodotto, p.nome, p.descrizione
+    SELECT
+        p.codice_prodotto,
+        p.nome,
+        p.descrizione
     FROM prodotto p
     ORDER BY p.nome;
 END;

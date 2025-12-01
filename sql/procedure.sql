@@ -129,12 +129,12 @@ $$ LANGUAGE plpgsql;
 /* Permette di creare un nuovo negozio. */
 CREATE OR REPLACE PROCEDURE add_negozio(
     _indirizzo VARCHAR,
-    _orario VARCHAR,
+    _orario_apertura VARCHAR,
     _responsabile VARCHAR
 ) AS $$
 BEGIN
     INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
-    VALUES (_indirizzo, _orario, _responsabile, FALSE);
+    VALUES (_indirizzo, _orario_apertura, _responsabile, FALSE);
 END;
 $$ LANGUAGE plpgsql;
 
