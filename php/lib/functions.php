@@ -354,7 +354,7 @@ function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio
 {
     $db = open_pg_connection();
     $params = array($codice_prodotto, $quantita, $codice_negozio);
-    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $3);";
+    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $3) AS numero_ordine;";
     $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
     $result = @pg_execute($db, 'ordina_prodotto_as_negozio', $params);
     if ($result === false) {
