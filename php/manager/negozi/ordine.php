@@ -10,7 +10,7 @@ $ok = $err = null;
 $prodotti = [];
 $codice_negozio = '';
 if (!empty($_POST['codice_negozio'])) {
-    $partita_iva = $_POST['codice_negozio'];
+    $codice_negozio = $_POST['codice_negozio'];
     $prodotti = get_all_prodotti();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
