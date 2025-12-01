@@ -342,6 +342,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi ai prodotti non in vendita presso un fornitore. */
+CREATE OR REPLACE FUNCTION get_prodotti_fuori_catalogo_by_fornitore(_partita_iva VARCHAR)
+RETURNS TABLE (
+    codice_prodotto UUID,
+    nome           VARCHAR,
+    descrizione    VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.codice_prodotto, p.nome, p.descrizione
+    FROM prodotto p
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM venduto_da v
+        WHERE v.codice_prodotto = p.codice_prodotto AND v.partita_iva = _partita_iva
+    );
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi a tutti i fornitori. */
 CREATE OR REPLACE FUNCTION get_all_fornitori()
 RETURNS TABLE (

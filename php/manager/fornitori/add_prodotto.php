@@ -6,28 +6,26 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
+
 $ok = $err = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
+$prodotti_disponibili = [];
+$partita_iva = '';
+if (!empty($_POST['partita_iva'])) {
     $partita_iva = $_POST['partita_iva'];
-    //
+    $prodotti_disponibili = get_prodotti_fuori_catalogo_by_fornitore($partita_iva);
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
+    $partita_iva = $_POST['partita_iva'];
     $codice_prodotto = $_POST['codice_prodotto'];
     $prezzo = $_POST['prezzo'];
     $quantita = $_POST['quantita'];
-    if (
-        $codice_prodotto === '' || $prezzo === '' || $quantita === ''
-    ) {
+    if ($partita_iva === '' || $codice_prodotto === '' || $prezzo === '' || $quantita === '') {
         $err = "Compila tutti i campi";
     }
     if (!$err) {
-        if (
-            add_prodotto_as_fornitore(
-                $partita_iva,
-                $codice_prodotto,
-                $prezzo,
-                $quantita,
-            )
-        ) {
+        if (add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $quantita)) {
             $ok = "Prodotto aggiunto con successo";
+            $prodotti_disponibili = get_prodotti_fuori_catalogo_by_fornitore($partita_iva);
         } else {
             $err = "Errore aggiunta prodotto";
         }
@@ -60,7 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
                 <label class="form-label">Prodotto</label>
-                <input name="codice_prodotto" class="form-control" required>
+                <select name="codice_prodotto" class="form-select" required>
+                    <option value="" disabled selected>Seleziona un prodotto</option>
+                    <?php foreach ($prodotti_disponibili as $p): ?>
+                        <option value="<?= htmlspecialchars($p['codice_prodotto']) ?>">
+                            <?= htmlspecialchars($p['codice_prodotto']) ?> — <?= htmlspecialchars($p['nome']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div><br>
             <div class="col-md-4">
                 <label class="form-label">Prezzo di vendita (€)</label>

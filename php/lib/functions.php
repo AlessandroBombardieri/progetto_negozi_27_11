@@ -217,6 +217,25 @@ function get_prodotti_by_fornitore($partita_iva)
 
 /**
  * M
+ * Restituisce tutti i prodotti non ancora in catalogo per un dato fornitore.
+ */
+function get_prodotti_fuori_catalogo_by_fornitore(string $partita_iva): array
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva);
+    $sql = "SELECT * FROM get_prodotti_fuori_catalogo_by_fornitore($1);";
+    $result = pg_prepare($db, 'prodotti_fuori_catalogo', $sql);
+    $result = pg_execute($db, 'prodotti_fuori_catalogo', $params);
+    $prodotti = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $prodotti[] = $row;
+    }
+    close_pg_connection($db);
+    return $prodotti;
+}
+
+/**
+ * M
  * Aggiungi un prodotto all'inventario di un dato fornitore.
  */
 function add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $quantita)
