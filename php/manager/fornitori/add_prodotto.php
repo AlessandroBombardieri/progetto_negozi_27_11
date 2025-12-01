@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+
             <div class="col-md-7">
                 <label class="form-label">Prodotto</label>
                 <select name="codice_prodotto" class="form-select" required>
@@ -81,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                 <input type="number" step="1" min="0" name="quantita" class="form-control" required>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success">Aggiungi</button>
+                <button class="btn btn-success" name="submit_add" value="1">Aggiungi</button>
             </div>
         </form>
     </div>
