@@ -46,7 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="h4 mb-0">Aggiungi prodotto</h1>
-            <a class="btn btn-outline-secondary" href="catalogo.php">← Torna a catalogo</a>
+            <form method="post" action="catalogo.php" class="d-inline">
+                <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                <button type="submit" class="btn btn-outline-secondary">
+                    ← Torna a catalogo
+                </button>
+            </form>
         </div>
 
         <?php if ($ok): ?>
@@ -55,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 
         <form method="post" class="card p-3 shadow-sm">
+            <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
             <div class="col-md-7">
                 <label class="form-label">Prodotto</label>
                 <select name="codice_prodotto" class="form-select" required>
