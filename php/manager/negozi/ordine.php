@@ -21,11 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
         $err = "Compila tutti i campi";
     }
     if (!$err) {
-        if ($numero_ordine = ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)) {
-            $ok = "Prodotto ordinato con successo, numero ordine: " . htmlspecialchars($numero_ordine);
+        $esito = ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio);
+        if ($esito['ok']) {
+            $ok = "Prodotto ordinato con successo, numero ordine: " . htmlspecialchars($esito['numero_ordine']);
             $prodotti = get_all_prodotti();
         } else {
-            $err = "Errore ordine prodotto";
+            $err = $esito['msg'];
         }
     }
 }

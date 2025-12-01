@@ -335,13 +335,33 @@ function get_prodotti_by_negozio(string $codice_negozio): array
  * M
  * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
  */
-function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
+/*function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
 {
     $db = open_pg_connection();
     $params = array($codice_prodotto, $quantita, $codice_negozio);
-    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $2);";
+    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $3);";
     $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
     $result = pg_execute($db, 'ordina_prodotto_as_negozio', $params);
     close_pg_connection($db);
     return pg_fetch_assoc($result);
+}*/
+
+/**
+ * M
+ * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
+ */
+function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
+{
+    $db = open_pg_connection();
+    $params = array($codice_prodotto, $quantita, $codice_negozio);
+    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $3);";
+    $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
+    $result = @pg_execute($db, 'ordina_prodotto_as_negozio', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return ['ok' => false, 'msg' => 'Nessun fornitore ha scorte sufficienti per questa quantità.'];
+    }
+    $row = pg_fetch_assoc($result);
+    close_pg_connection($db);
+    return ['ok' => true, 'numero_ordine' => $row['numero_ordine']];
 }
