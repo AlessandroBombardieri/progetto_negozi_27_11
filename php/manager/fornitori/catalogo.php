@@ -29,9 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
             <h1 class="h4 mb-0">Prodotti</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="home.php">← Home manager</a>
-                <a class="btn btn-success" href="add_prodotto.php?partita_iva=<?= htmlspecialchars($partita_iva) ?>">
+                <!--<a class="btn btn-success" href="add_prodotto.php?partita_iva=<?= htmlspecialchars($partita_iva) ?>">
                     Aggiungi prodotto
-                </a>
+                </a> -->
+                <form method="post" action="add_prodotto.php" class="d-inline">
+                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                    <button class="btn btn-success">Aggiungi prodotto</button>
+                </form>
             </div>
         </div>
         <div class="table-responsive bg-white shadow-sm rounded">

@@ -44,8 +44,13 @@ $rows = get_all_fornitori();
                             <td><?= htmlspecialchars($r['partita_iva']) ?></td>
                             <td><?= htmlspecialchars($r['indirizzo']) ?></td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary"
-                                    href="catalogo.php?piva=<?= urlencode($r['partita_iva']) ?>">Gestisci prodotti</a>
+                                <form method="post" action="catalogo.php" class="d-inline">
+                                    <input type="hidden" name="partita_iva"
+                                        value="<?= htmlspecialchars($r['partita_iva']) ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Gestisci prodotti
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach;

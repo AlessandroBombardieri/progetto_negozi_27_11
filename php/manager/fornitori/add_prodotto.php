@@ -6,9 +6,6 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
-
-var_dump($_POST);
-
 $ok = $err = null;
 $prodotti_disponibili = [];
 $partita_iva = '';
@@ -58,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 
         <form method="post" class="card p-3 shadow-sm">
-            <div class="col-md-4">
+            <div class="col-md-7">
                 <label class="form-label">Prodotto</label>
                 <select name="codice_prodotto" class="form-select" required>
                     <option value="" disabled selected>Seleziona un prodotto</option>
@@ -69,11 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                     <?php endforeach; ?>
                 </select>
             </div><br>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label class="form-label">Prezzo di vendita (€)</label>
                 <input type="number" step="0.01" min="0" name="prezzo" class="form-control" required>
             </div><br>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label class="form-label">Quantità disponibile</label>
                 <input type="number" step="1" min="0" name="quantita" class="form-control" required>
             </div><br>
