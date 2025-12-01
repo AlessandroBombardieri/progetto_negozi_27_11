@@ -209,8 +209,23 @@ function get_prodotti_by_fornitore($partita_iva)
     $result = pg_execute($db, 'prodotti', $params);
     $prodotti = [];
     while ($row = pg_fetch_assoc($result)) {
-        $orodotti[] = $row;
+        $prodotti[] = $row;
     }
     close_pg_connection($db);
     return $prodotti;
+}
+
+/**
+ * M
+ * Aggiungi un prodotto all'inventario di un dato fornitore.
+ */
+function add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $quantita)
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva, $codice_prodotto, $prezzo, $quantita);
+    $sql = "CALL add_prodotto_as_fornitore($1, $2, $3, $4);";
+    $result = pg_prepare($db, 'add_prodotto_as_fornitore', $sql);
+    $result = @pg_execute($db, 'add_prodotto_as_fornitore', $params);
+    close_pg_connection($db);
+    return $result;
 }

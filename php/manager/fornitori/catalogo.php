@@ -6,11 +6,10 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
-if (isset($_POST)) {
-    if (!empty($_POST['partita_iva'])) {
-        $partita_iva = $_POST['partita_iva'];
-        $rows = get_prodotti_by_fornitore($partita_iva);
-    }
+$rows = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
+    $partita_iva = $_POST['partita_iva'];
+    $rows = get_prodotti_by_fornitore($partita_iva);
 }
 ?>
 
@@ -30,7 +29,7 @@ if (isset($_POST)) {
             <h1 class="h4 mb-0">Prodotti</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="home.php">← Home manager</a>
-                <a class="btn btn-success" href="add_prodotto.php">Aggiungi prodotto</a>
+                <a class="btn btn-success" href="add_prodotto.php?piva=<?= urlencode($partita_iva) ?>">Aggiungi prodotto</a>
             </div>
         </div>
 
@@ -41,6 +40,8 @@ if (isset($_POST)) {
                         <th>Codice prodotto</th>
                         <th>nome</th>
                         <th>descrizione</th>
+                        <th>prezzo</th>
+                        <th>quantita</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +50,8 @@ if (isset($_POST)) {
                             <td><?= htmlspecialchars($r['codice_prodotto']) ?></td>
                             <td><?= htmlspecialchars($r['nome']) ?></td>
                             <td><?= htmlspecialchars($r['descrizione']) ?></td>
+                            <td><?= htmlspecialchars($r['prezzo']) ?></td>
+                            <td><?= htmlspecialchars($r['quantita']) ?></td>
                         </tr>
                     <?php endforeach;
                     if (!$rows): ?>
