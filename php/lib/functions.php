@@ -335,21 +335,6 @@ function get_prodotti_by_negozio(string $codice_negozio): array
  * M
  * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
  */
-/*function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
-{
-    $db = open_pg_connection();
-    $params = array($codice_prodotto, $quantita, $codice_negozio);
-    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $3);";
-    $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
-    $result = pg_execute($db, 'ordina_prodotto_as_negozio', $params);
-    close_pg_connection($db);
-    return pg_fetch_assoc($result);
-}*/
-
-/**
- * M
- * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
- */
 function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
 {
     $db = open_pg_connection();
@@ -364,4 +349,19 @@ function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio
     $row = pg_fetch_assoc($result);
     close_pg_connection($db);
     return ['ok' => true, 'numero_ordine' => $row['numero_ordine']];
+}
+
+/**
+ * M
+ * Modifica il prezzo di un prodotto in vendita presso un dato negozio.
+ */
+function update_prezzo_prodotto_as_negozio($codice_negozio, $codice_prodotto, $nuovo_prezzo)
+{
+    $db = open_pg_connection();
+    $params = array($codice_negozio, $codice_prodotto, $nuovo_prezzo);
+    $sql = "CALL update_prezzo_prodotto_as_negozio($1, $2, $3);";
+    $result = pg_prepare($db, 'update_prezzo_prodotto_as_negozio', $sql);
+    $result = @pg_execute($db, 'update_prezzo_prodotto_as_negozio', $params);
+    close_pg_connection($db);
+    return $result;
 }
