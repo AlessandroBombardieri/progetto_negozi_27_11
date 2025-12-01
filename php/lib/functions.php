@@ -339,7 +339,7 @@ function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio
 {
     $db = open_pg_connection();
     $params = array($codice_prodotto, $quantita, $codice_negozio);
-    $sql = "SELECT * FROM get_utente_by_codice_fiscale($1);";
+    $sql = "SELECT * FROM ordina_prodotto_as_negozio($1, $2, $2);";
     $result = pg_prepare($db, 'ordina_prodotto_as_negozio', $sql);
     $result = pg_execute($db, 'ordina_prodotto_as_negozio', $params);
     close_pg_connection($db);
