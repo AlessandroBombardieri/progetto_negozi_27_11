@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
                         <th>descrizione</th>
                         <th>prezzo</th>
                         <th>quantita</th>
+                        <th class="text-end">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
                             <td><?= htmlspecialchars($r['descrizione']) ?></td>
                             <td><?= htmlspecialchars($r['prezzo']) ?></td>
                             <td><?= htmlspecialchars($r['quantita']) ?></td>
+                            <td class="text-end">
+                                <form method="post" action="update_scorte.php" class="d-inline">
+                                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Incrementa scorte
+                                    </button>
+                                </form>
+                                <form method="post" action="update_prezzo.php" class="d-inline">
+                                    <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Modifica prezzo
+                                    </button>
+                                </form>
                         </tr>
                     <?php endforeach;
                     if (!$rows): ?>
