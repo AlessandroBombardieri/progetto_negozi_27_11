@@ -84,7 +84,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Fornitori</h5>
                         <p class="card-text text-muted">Elenco e cataloghi fornitori.</p>
-                        <a class="btn btn-outline-primary" href="fornitori/index.php">Gestisci fornitori</a>
+                        <a class="btn btn-outline-primary" href="fornitori/home.php">Gestisci fornitori</a>
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Prodotti</h5>
                         <p class="card-text text-muted">Elenco globale dei prodotti.</p>
-                        <a class="btn btn-outline-primary" href="prodotti/index.php">Gestisci prodotti</a>
+                        <a class="btn btn-outline-primary" href="prodotti/home.php">Gestisci prodotti</a>
                     </div>
                 </div>
             </div>
@@ -111,13 +111,24 @@ $u = $_SESSION['utente'];
                 </div>
             </div>
 
+            <!-- Ordini -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Ordini</h5>
+                        <p class="card-text text-muted">Storico ordini effettuati presso fornitori.</p>
+                        <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Visualizza storico ordini</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Fatture -->
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Fatture</h5>
                         <p class="card-text text-muted">Storici per cliente/prodotto/negozio.</p>
-                        <a class="btn btn-outline-primary" href="fatture/index.php">Gestisci fatture</a>
+                        <a class="btn btn-outline-primary" href="fatture/index.php">Visualizza storico fatture</a>
                     </div>
                 </div>
             </div>

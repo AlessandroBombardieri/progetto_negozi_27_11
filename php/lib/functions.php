@@ -129,3 +129,36 @@ function add_cliente($cf, $email, $password, $nome, $cognome, $provincia, $citta
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Restituisce tutti i prodotti.
+ */
+function get_all_prodotti(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_all_prodotti();";
+    $result = pg_prepare($db, 'list_prodotti', $sql);
+    $result = pg_execute($db, 'list_prodotti', array());
+    $prodotti = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $prodotti[] = $row;
+    }
+    close_pg_connection($db);
+    return $prodotti;
+}
+
+/**
+ * M
+ * Crea un nuovo prodotto.
+ */
+function add_prodotto($nome, $descrizione)
+{
+    $db = open_pg_connection();
+    $params = array($nome, $descrizione);
+    $sql = "CALL add_prodotto($1, $2);";
+    $result = pg_prepare($db, 'add_prodotto', $sql);
+    $result = @pg_execute($db, 'add_prodotto', $params);
+    close_pg_connection($db);
+    return $result;
+}
