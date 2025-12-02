@@ -9,6 +9,7 @@ if (!isset($_SESSION['utente'])) {
 $err = null;
 $rows = [];
 $rows_ = [];
+$rows__ = [];
 $negozi_non_dismessi = get_negozi_non_dismessi();
 $negozi_dismessi = get_negozi_dismessi();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
         $rows_ = get_tesserati_by_negozio_dismesso($codice_negozio_dismesso);
     }
 }
+$rows__ = get_tesserati_premium();
 ?>
 
 <!doctype html>
@@ -123,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                         <button class="btn btn-outline-primary w-100" name="submit_add_" value="1">Mostra</button>
                     </div>
                 </form>
-
                 <div class="table-responsive bg-white shadow-sm rounded">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -148,6 +149,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                                 </tr>
                             <?php endforeach;
                             if (!$rows_): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">Nessun cliente</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Elenco clienti premium</h2>
+                <div class="table-responsive bg-white shadow-sm rounded">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>CF</th>
+                                <th>Email</th>
+                                <th>Nome</th>
+                                <th>Cognome</th>
+                                <th>Codice Tessera</th>
+                                <th>Codice Negozio</th>
+                                <th>Saldo punti</th>
+                                <th>Dismessa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($rows__ as $r): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
+                                    <td><?= htmlspecialchars($r['email']) ?></td>
+                                    <td><?= htmlspecialchars($r['nome']) ?></td>
+                                    <td><?= htmlspecialchars($r['cognome']) ?></td>
+                                    <td><?= htmlspecialchars($r['codice_tessera']) ?></td>
+                                    <td><?= htmlspecialchars($r['codice_negozio']) ?></td>
+                                    <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
+                                    <td><?= htmlspecialchars($r['data_richiesta']) ?></td>
+                                </tr>
+                            <?php endforeach;
+                            if (!$rows__): ?>
                                 <tr>
                                     <td colspan="6" class="text-center text-muted py-4">Nessun cliente</td>
                                 </tr>

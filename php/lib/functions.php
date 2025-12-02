@@ -463,3 +463,24 @@ function add_tessera($codice_negozio, $codice_fiscale)
     return $result;
 }
 
+/**
+ * M
+ * Restituisce i dati di tessere associate a clienti premium, ovvero con un saldo punti superiore a 300 punti.
+ */
+function get_tesserati_premium(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM view_clienti_almeno_300_punti;";
+    $result = pg_prepare($db, 'get_clienti_premium', $sql);
+    $result = pg_execute($db, 'get_clienti_premium', array());
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $tessere = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $tessere[] = $row;
+    }
+    close_pg_connection($db);
+    return $tessere;
+}
