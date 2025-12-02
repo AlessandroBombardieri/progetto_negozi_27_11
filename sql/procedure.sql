@@ -191,13 +191,13 @@ BEGIN
     ) THEN
         UPDATE tessera_fedelta
         SET dismessa = FALSE,
-            data_rilascio = _data,
+            data_richiesta = _data,
             codice_negozio = _codice_negozio
         WHERE codice_fiscale = _codice_fiscale AND dismessa = TRUE;
         RETURN;
     END IF;
     -- Altrimenti crea una nuova tessera con saldo punti iniziale pari a 0.
-    INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_rilascio, saldo_punti, dismessa)
+    INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
     VALUES (_codice_negozio, _codice_fiscale, _data, 0, FALSE);
 END;
 $$ LANGUAGE plpgsql;

@@ -439,7 +439,6 @@ function get_tesserati_by_negozio($codice_negozio): array
     return $tessere;
 }
 
-
 /**
  * M
  * Crea una nuova tessera fedeltà.

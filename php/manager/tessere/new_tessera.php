@@ -14,7 +14,7 @@ $negozi_non_dismessi = get_negozi_non_dismessi();
 $clienti = get_all_clienti();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
     $codice_negozio_non_dismesso = $_POST['codice_negozio_non_dismesso'];
-    $codice_fiscale = $_POST['$codice_fiscale'];
+    $codice_fiscale = $_POST['codice_fiscale'];
     if ($codice_negozio_non_dismesso === '' || $codice_fiscale === '') {
         $err = "Compila tutti i campi";
     }
