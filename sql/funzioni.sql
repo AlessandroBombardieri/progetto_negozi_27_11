@@ -303,6 +303,50 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi a tutti i negozi non dismessi. */
+CREATE OR REPLACE FUNCTION get_negozi_non_dismessi()
+RETURNS TABLE (
+    codice_negozio UUID,
+	indirizzo VARCHAR,
+	orario_apertura VARCHAR,
+	nominativo_responsabile VARCHAR,
+	dismesso BOOL
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        n.codice_negozio,
+        n.indirizzo,
+        n.orario_apertura,
+        n.nominativo_responsabile,
+        n.dismesso
+    FROM negozio n
+    WHERE n.dismesso = FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi a tutti i negozi dismessi. */
+CREATE OR REPLACE FUNCTION get_negozi_dismessi()
+RETURNS TABLE (
+    codice_negozio UUID,
+	indirizzo VARCHAR,
+	orario_apertura VARCHAR,
+	nominativo_responsabile VARCHAR,
+	dismesso BOOL
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        n.codice_negozio,
+        n.indirizzo,
+        n.orario_apertura,
+        n.nominativo_responsabile,
+        n.dismesso
+    FROM negozio n
+    WHERE n.dismesso = TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi a tutti i prodotti. */
 CREATE OR REPLACE FUNCTION get_all_prodotti()
 RETURNS TABLE (

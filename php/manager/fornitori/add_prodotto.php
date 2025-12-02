@@ -61,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
-
             <div class="col-md-7">
                 <label class="form-label">Prodotto</label>
                 <select name="codice_prodotto" class="form-select" required>

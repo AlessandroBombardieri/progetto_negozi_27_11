@@ -365,3 +365,57 @@ function update_prezzo_prodotto_as_negozio($codice_negozio, $codice_prodotto, $n
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Restituisce tutti i negozi non dismessi.
+ */
+function get_negozi_non_dismessi(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_negozi_non_dismessi();";
+    $result = pg_prepare($db, 'get_negozi_non_dismessi', $sql);
+    $result = pg_execute($db, 'get_negozi_non_dismessi', array());
+    $negozi = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $negozi[] = $row;
+    }
+    close_pg_connection($db);
+    return $negozi;
+}
+
+/**
+ * M
+ * Restituisce tutti i negozi dismessi.
+ */
+function get_negozi_dismessi(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_negozi_dismessi();";
+    $result = pg_prepare($db, 'get_negozi_dismessi', $sql);
+    $result = pg_execute($db, 'get_negozi_dismessi', array());
+    $negozi = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $negozi[] = $row;
+    }
+    close_pg_connection($db);
+    return $negozi;
+}
+
+/**
+ * M
+ * Restituisce i dati di utenti e tessere associate ad un dato negozo.
+ */
+function get_tesserati_by_negozio($codice_negozio): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_tesserati_by_negozio($1);";
+    $result = pg_prepare($db, 'get_tesserati_by_negozio', $sql);
+    $result = @pg_execute($db, 'get_tesserati_by_negozio', array());
+    $tessere = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $tessere[] = $row;
+    }
+    close_pg_connection($db);
+    return $tessere;
+}

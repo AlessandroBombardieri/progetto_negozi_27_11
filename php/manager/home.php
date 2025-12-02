@@ -60,7 +60,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Tessere</h5>
                         <p class="card-text text-muted">Associa tessere a clienti/negozi.</p>
-                        <a class="btn btn-outline-primary" href="tessere/index.php">Gestisci tessere</a>
+                        <a class="btn btn-outline-primary" href="tessere/home.php">Gestisci tessere</a>
                     </div>
                 </div>
             </div>
