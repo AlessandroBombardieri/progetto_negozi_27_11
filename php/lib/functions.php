@@ -438,3 +438,19 @@ function get_tesserati_by_negozio($codice_negozio): array
     close_pg_connection($db);
     return $tessere;
 }
+
+
+/**
+ * M
+ * Crea una nuova tessera fedeltà.
+ */
+function add_tessera($codice_negozio, $codice_fiscale)
+{
+    $db = open_pg_connection();
+    $params = array($codice_negozio, $codice_fiscale);
+    $sql = "CALL add_negozio($1, $2, CURRENT_DATE);";
+    $result = pg_prepare($db, 'add_tessera', $sql);
+    $result = pg_execute($db, 'add_tessera', $params);
+    close_pg_connection($db);
+    return $result;
+}

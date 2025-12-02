@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
             <h1 class="h4 mb-0">Tessere fedeltà</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="new_fornitore.php">Nuova tessera fedeltà</a>
+                <a class="btn btn-success" href="new_tessera.php">Nuova tessera fedeltà</a>
             </div>
         </div>
         <?php if ($err): ?>
