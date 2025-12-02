@@ -426,7 +426,7 @@ function get_tesserati_by_negozio($codice_negozio): array
     $params = array($codice_negozio);
     $sql = "SELECT * FROM get_tesserati_by_negozio($1);";
     $result = pg_prepare($db, 'get_tesserati_by_negozio', $sql);
-    $result = @pg_execute($db, 'get_tesserati_by_negozio', $params);
+    $result = pg_execute($db, 'get_tesserati_by_negozio', $params);
     if ($result === false) {
         close_pg_connection($db);
         return [];
