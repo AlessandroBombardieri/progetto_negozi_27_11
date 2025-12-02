@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                 </select>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success">Crea</button>
+                <button class="btn btn-success" name="submit_add">Crea</button>
             </div>
         </form>
     </div>
