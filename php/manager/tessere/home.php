@@ -6,7 +6,6 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
-$negozi_non_dismessi = [];
 $negozi_non_dismessi = get_negozi_non_dismessi();
 $err = null;
 $rows = [];
@@ -41,50 +40,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
             </div>
         </div>
 
-        <form method="post" class="card p-3 shadow-sm">
-            <div class="col-md-7">
-                <label class="form-label">Negozio</label>
-                <select name="codice_negozio" class="form-select" required>
-                    <option value="" disabled selected>Seleziona un negozio</option>
-                    <?php foreach ($negozi_non_dismessi as $p): ?>
-                        <option value="<?= htmlspecialchars($p['codice_negozio']) ?>">
-                            <?= htmlspecialchars($p['codice_negozio']) ?> — <?= htmlspecialchars($p['indirizzo']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <button class="btn btn-success" name="submit_add" value="1">Mostra</button>
-            </div><br>
-        </form>
-        <div class="table-responsive bg-white shadow-sm rounded">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>CF</th>
-                        <th>Email</th>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Saldo punti</th>
-                        <th>Data di rilascio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($rows as $r): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
-                            <td><?= htmlspecialchars($r['email']) ?></td>
-                            <td><?= htmlspecialchars($r['nome']) ?></td>
-                            <td><?= htmlspecialchars($r['cognome']) ?></td>
-                            <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
-                            <td><?= htmlspecialchars($r['data_rilascio']) ?></td>
-                        </tr>
-                    <?php endforeach;
-                    if (!$rows): ?>
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Nessun cliente</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+        <div>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Tesserati per negozio</h2>
+                    <form method="post" class="row g-2 mb-3">
+                        <div class="col-md-8">
+                            <select name="codice_negozio" class="form-select" required>
+                                <option value="" disabled selected>Seleziona un negozio</option>
+                                <?php foreach ($negozi_non_dismessi as $p): ?>
+                                    <option value="<?= htmlspecialchars($p['codice_negozio']) ?>">
+                                        <?= htmlspecialchars($p['codice_negozio']) ?> —
+                                        <?= htmlspecialchars($p['indirizzo']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-primary w-100" name="submit_add" value="1">Mostra</button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive bg-white shadow-sm rounded">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>CF</th>
+                                    <th>Email</th>
+                                    <th>Nome</th>
+                                    <th>Cognome</th>
+                                    <th>Saldo punti</th>
+                                    <th>Data di rilascio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($rows as $r): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
+                                        <td><?= htmlspecialchars($r['email']) ?></td>
+                                        <td><?= htmlspecialchars($r['nome']) ?></td>
+                                        <td><?= htmlspecialchars($r['cognome']) ?></td>
+                                        <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
+                                        <td><?= htmlspecialchars($r['data_rilascio']) ?></td>
+                                    </tr>
+                                <?php endforeach;
+                                if (!$rows): ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Nessun cliente</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>

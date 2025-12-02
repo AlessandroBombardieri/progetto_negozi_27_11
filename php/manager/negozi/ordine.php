@@ -62,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="codice_negozio" value="<?= htmlspecialchars($codice_negozio) ?>">
             <div class="col-md-7">
-                <label class="form-label">Prodotto</label>
                 <select name="codice_prodotto" class="form-select" required>
                     <option value="" disabled selected>Seleziona un prodotto</option>
                     <?php foreach ($prodotti as $p): ?>
