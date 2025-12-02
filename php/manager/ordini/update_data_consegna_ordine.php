@@ -9,7 +9,7 @@ if (!isset($_SESSION['utente'])) {
 $ok = $err = null;
 $numero_ordine = '';
 if (!empty($_POST['numero_ordine'])) {
-    $codice_negozio = $_POST['numero_ordine'];
+    $numero_ordine = $_POST['numero_ordine'];
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
     $data_consegna = $_POST['data_consegna'];
