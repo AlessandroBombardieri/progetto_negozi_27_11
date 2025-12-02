@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                     <option value="" disabled selected>Seleziona un cliente</option>
                     <?php foreach ($clienti as $p): ?>
                         <option value="<?= htmlspecialchars($p['codice_fiscale']) ?>">
-                            <?= htmlspecialchars($p['nome']) ?> —
+                            <?= htmlspecialchars($p['nome']) ?>
                             <?= htmlspecialchars($p['cognome']) ?>
                         </option>
                     <?php endforeach; ?>

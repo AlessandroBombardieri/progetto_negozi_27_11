@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                                 <th>Nome</th>
                                 <th>Cognome</th>
                                 <th>Saldo punti</th>
-                                <th>Data di rilascio</th>
+                                <th>Data di richiesta</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                                     <td><?= htmlspecialchars($r['nome']) ?></td>
                                     <td><?= htmlspecialchars($r['cognome']) ?></td>
                                     <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
-                                    <td><?= htmlspecialchars($r['data_rilascio']) ?></td>
+                                    <td><?= htmlspecialchars($r['data_richiesta']) ?></td>
                                 </tr>
                             <?php endforeach;
                             if (!$rows): ?>
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                                 <th>Nome</th>
                                 <th>Cognome</th>
                                 <th>Saldo punti</th>
-                                <th>Data di rilascio</th>
+                                <th>Data di richiesta</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
                                     <td><?= htmlspecialchars($r['nome']) ?></td>
                                     <td><?= htmlspecialchars($r['cognome']) ?></td>
                                     <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
-                                    <td><?= htmlspecialchars($r['data_rilascio']) ?></td>
+                                    <td><?= htmlspecialchars($r['data_richiesta']) ?></td>
                                 </tr>
                             <?php endforeach;
                             if (!$rows_): ?>

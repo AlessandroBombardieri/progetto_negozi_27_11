@@ -80,19 +80,20 @@ RETURNS TABLE (
     cognome varchar,
     email varchar,
     saldo_punti bigint,
-    data_rilascio date
+    data_richiesta date
 ) AS $$
 BEGIN
-SELECT
-    u.codice_fiscale,
-    u.nome,
-    u.cognome,
-    u.email,
-    t.saldo_punti,
-    t.data_rilascio
-FROM tessera_fedelta AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
-WHERE t.codice_negozio = _codice_negozio AND t.dismessa = FALSE
-ORDER BY u.cognome, u.nome;
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.nome,
+        u.cognome,
+        u.email,
+        t.saldo_punti,
+        t.data_richiesta
+    FROM tessera_fedelta AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
+    WHERE t.codice_negozio = _codice_negozio AND t.dismessa = FALSE
+    ORDER BY u.cognome, u.nome;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -576,7 +577,7 @@ RETURNS TABLE (
     codice_tessera UUID,
     saldo_punti    INT8,
     codice_negozio UUID,
-    data_rilascio  DATE,
+    data_richiesta  DATE,
     dismessa       BOOLEAN
 ) AS $$
 BEGIN
@@ -585,10 +586,10 @@ BEGIN
         t.codice_tessera,
         t.saldo_punti,
         t.codice_negozio,
-        t.data_rilascio,
+        t.data_richiesta,
         t.dismessa
     FROM tessera_fedelta AS t
     WHERE t.codice_fiscale = _codice_fiscale
-    ORDER BY t.data_rilascio DESC;
+    ORDER BY t.data_richiesta DESC;
 END;
 $$ LANGUAGE plpgsql;
