@@ -593,3 +593,28 @@ BEGIN
     ORDER BY t.data_richiesta DESC;
 END;
 $$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle tessere fedeltà emesse da un negozio dismesso. */
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio uuid)
+RETURNS TABLE (
+    codice_fiscale varchar,
+    nome varchar,
+    cognome varchar,
+    email varchar,
+    saldo_punti bigint,
+    data_richiesta date
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.nome,
+        u.cognome,
+        u.email,
+        t.saldo_punti,
+        t.data_richiesta
+    FROM view_tessere_dismesse AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
+    WHERE t.codice_negozio = _codice_negozio
+    ORDER BY u.cognome, u.nome;
+END;
+$$ LANGUAGE plpgsql;

@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
         $err = "Compila tutti i campi";
     }
     if (!$err) {
-        $rows_ = get_tesserati_by_negozio($codice_negozio_dismesso);
+        $rows_ = get_tesserati_by_negozio_dismesso($codice_negozio_dismesso);
     }
 }
 ?>
