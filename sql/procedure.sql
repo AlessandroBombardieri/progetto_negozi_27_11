@@ -267,12 +267,12 @@ $$ LANGUAGE plpgsql;
 /* Permette di aggiornare la data di consegna di un ordine. */
 CREATE OR REPLACE PROCEDURE update_data_consegna_ordine(
     _numero_ordine UUID,
-    _data DATE
+    _data_consegna DATE
 ) AS $$
 DECLARE
     _data_ordine DATE;
 BEGIN
-    IF _data IS NULL THEN
+    IF _data_consegna IS NULL THEN
         RAISE EXCEPTION 'La data di consegna non può essere NULL';
     END IF;
     SELECT data_ordine INTO _data_ordine
@@ -282,11 +282,11 @@ BEGIN
         RAISE EXCEPTION 'Ordine % inesistente', _numero_ordine;
     END IF;
     -- Se la nuova data di consegna dell'ordine è precedente rispetto alla data dell'ordinazione allora segnala errore.
-    IF _data < _data_ordine THEN
-        RAISE EXCEPTION 'La data di consegna (%) non può essere precedente alla data ordine (%)', _data, _data_ordine;
+    IF _data_consegna < _data_ordine THEN
+        RAISE EXCEPTION 'La data di consegna (%) non può essere precedente alla data ordine (%)', _data_consegna, _data_ordine;
     END IF;
     UPDATE ordine
-    SET data_consegna = _data
+    SET data_consegna = _data_consegna
     WHERE numero_ordine = _numero_ordine;
 END;
 $$ LANGUAGE plpgsql;

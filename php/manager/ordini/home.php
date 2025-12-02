@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                                 <th>Data ordine</th>
                                 <th>Data consegna</th>
                                 <th>Totale</th>
+                                <th class="text-end">Azioni</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,6 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                                     <td><?= htmlspecialchars($r['data_ordine']) ?></td>
                                     <td><?= htmlspecialchars($r['data_consegna'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($r['totale']) ?></td>
+                                    <td class="text-end">
+                                        <form method="post" action="update_data_consegna_ordine.php" class="d-inline">
+                                            <input type="hidden" name="numero_ordine"
+                                                value="<?= htmlspecialchars($r['numero_ordine']) ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                Inserisci data consegna
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             <?php endforeach;
                             if (!$rows): ?>

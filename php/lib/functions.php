@@ -507,3 +507,18 @@ function get_storico_ordini_by_fornitore($partita_iva): array
     close_pg_connection($db);
     return $ordini;
 }
+
+/**
+ * M
+ * Modifica il prezzo di un prodotto in vendita presso un dato negozio.
+ */
+function update_data_consegna_ordine($numero_ordine, $data_consegna)
+{
+    $db = open_pg_connection();
+    $params = array($numero_ordine, $data_consegna);
+    $sql = "CALL update_data_consegna_ordine($1, $2);";
+    $result = pg_prepare($db, 'update_data_consegna_ordine', $sql);
+    $result = @pg_execute($db, 'update_data_consegna_ordine', $params);
+    close_pg_connection($db);
+    return $result;
+}
