@@ -106,7 +106,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Storico ordini</h5>
                         <p class="card-text text-muted">Storico ordini effettuati presso fornitori.</p>
-                        <a class="btn btn-outline-primary mb-1" href="ordini/index.php">Visualizza storico ordini</a>
+                        <a class="btn btn-outline-primary mb-1" href="ordini/home.php">Visualizza storico ordini</a>
                     </div>
                 </div>
             </div>

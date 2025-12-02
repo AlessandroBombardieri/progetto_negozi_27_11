@@ -484,3 +484,26 @@ function get_tesserati_premium(): array
     close_pg_connection($db);
     return $tessere;
 }
+
+/**
+ * M
+ * Restituisce i dati degli ordini effettuati presso un dato fornitore.
+ */
+function get_storico_ordini_by_fornitore($partita_iva): array
+{
+    $db = open_pg_connection();
+    $params = array($partita_iva);
+    $sql = "SELECT * FROM get_storico_ordini_by_fornitore($1);";
+    $result = pg_prepare($db, 'get_storico_ordini_by_fornitore', $sql);
+    $result = pg_execute($db, 'get_storico_ordini_by_fornitore', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $ordini = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $ordini[] = $row;
+    }
+    close_pg_connection($db);
+    return $ordini;
+}

@@ -170,8 +170,8 @@ $rows__ = get_tesserati_premium();
                                 <th>Email</th>
                                 <th>Nome</th>
                                 <th>Cognome</th>
-                                <th>Codice Tessera</th>
-                                <th>Codice Negozio</th>
+                                <th>Codice tessera</th>
+                                <th>Codice negozio</th>
                                 <th>Saldo punti</th>
                                 <th>Dismessa</th>
                             </tr>
