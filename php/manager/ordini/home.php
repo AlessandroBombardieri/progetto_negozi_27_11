@@ -65,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                         <thead class="table-light">
                             <tr>
                                 <th>Numero ordine</th>
-                                <th>Codice prodotto</th>
-                                <th>Codice negozio</th>
+                                <th>Nome prodotto</th>
+                                <th>Indirizzo negozio</th>
                                 <th>Quantità ordinata</th>
                                 <th>Data ordine</th>
                                 <th>Data consegna</th>
@@ -77,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                             <?php foreach ($rows as $r): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($r['numero_ordine']) ?></td>
-                                    <td><?= htmlspecialchars($r['codice_prodotto']) ?></td>
-                                    <td><?= htmlspecialchars($r['codice_negozio']) ?></td>
+                                    <td><?= htmlspecialchars($r['nome']) ?></td>
+                                    <td><?= htmlspecialchars($r['indirizzo']) ?></td>
                                     <td><?= htmlspecialchars($r['quantita_ordinata']) ?></td>
                                     <td><?= htmlspecialchars($r['data_ordine']) ?></td>
-                                    <td><?= htmlspecialchars($r['data_consegna']) ?></td>
+                                    <td><?= htmlspecialchars($r['data_consegna'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($r['totale']) ?></td>
                                 </tr>
                             <?php endforeach;

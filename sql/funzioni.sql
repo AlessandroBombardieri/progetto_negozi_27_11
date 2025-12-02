@@ -102,6 +102,8 @@ CREATE OR REPLACE FUNCTION get_storico_ordini_by_fornitore(_partita_iva VARCHAR)
 RETURNS TABLE (
     numero_ordine UUID,
     codice_prodotto UUID,
+    nome VARCHAR,
+    indirizzo VARCHAR,
     codice_negozio UUID,
     quantita_ordinata INT8,
     data_ordine DATE,
@@ -113,12 +115,16 @@ BEGIN
     SELECT
         o.numero_ordine,
         o.codice_prodotto,
+        p.nome,
         o.codice_negozio,
+        n.indirizzo,
         o.quantita_ordinata,
         o.data_ordine,
         o.data_consegna,
         o.totale
     FROM ordine o
+    JOIN prodotto p ON p.codice_prodotto = o.codice_prodotto
+    JOIN negozio n ON n.codice_negozio = o.codice_negozio
     WHERE o.partita_iva = _partita_iva
     ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
 END;
