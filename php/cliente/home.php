@@ -43,6 +43,33 @@ $u = $_SESSION['utente'];
                 </div>
             </div>
 
+            <!-- Tessere -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Tessera</h5>
+                        <p class="card-text text-muted">Vedi tessere attive e scadute, con saldo punti.</p>
+                        <form method="post" action="tessere/home.php" class="d-inline">
+                            <input type="hidden" name="codice_fiscale" value="<?= htmlspecialchars($r['codice_fiscale']) ?>">
+                            <button type="submit" class="btn btn-outline-primary"">
+                                Gestisci tessere
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fatture -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Fatture</h5>
+                        <p class="card-text text-muted">Storico dei tuoi acquisti.</p>
+                        <a class="btn btn-outline-primary" href="/cliente/fatture.php">Vedi fatture</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Prodotti -->
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
@@ -65,27 +92,6 @@ $u = $_SESSION['utente'];
                 </div>
             </div>
 
-            <!-- Tessere -->
-            <div class="col-sm-6 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Tessera fedeltà</h5>
-                        <p class="card-text text-muted">Vedi tessere attive e scadute, con saldo punti.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/tessere.php">Vedi tessere</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fatture -->
-            <div class="col-sm-6 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Fatture</h5>
-                        <p class="card-text text-muted">Storico dei tuoi acquisti.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/fatture.php">Vedi fatture</a>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="mt-4"><a href="/logout.php">Logout</a></div>
