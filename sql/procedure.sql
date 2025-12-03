@@ -167,33 +167,43 @@ CREATE OR REPLACE PROCEDURE add_tessera(
     _codice_fiscale VARCHAR,
     _data DATE
 ) AS $$
+DECLARE
+    _saldo_punti INT8;
 BEGIN
     -- Se il codice fiscale dell'utente non trova alcuna corrispondenza allora segnala errore.
-    IF NOT EXISTS (SELECT 1 FROM utente  WHERE codice_fiscale = _codice_fiscale) THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM utente
+        WHERE codice_fiscale = _codice_fiscale
+    ) THEN
         RAISE EXCEPTION 'Cliente % inesistente', _codice_fiscale;
     END IF;
     -- Se il codice negozio inserito non trova corrispondenza, allora segnala errore.
-    IF NOT EXISTS (SELECT 1 FROM negozio WHERE codice_negozio  = _codice_negozio) THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM negozio
+        WHERE codice_negozio = _codice_negozio
+    ) THEN
         RAISE EXCEPTION 'Negozio % inesistente', _codice_negozio;
     END IF;
     -- Se esiste già una tessera fedeltà attiva associata all'utente allora segnala errore.
     IF EXISTS (
-        SELECT 1 FROM tessera_fedelta
-        WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE
+        SELECT 1
+        FROM tessera_fedelta
+        WHERE codice_fiscale = _codice_fiscale
+          AND dismessa = FALSE
     ) THEN
         RAISE EXCEPTION 'Tessera attiva già presente per %', _codice_fiscale;
     END IF;
-    -- Se esiste una tessera dismessa associata all'utente allora la riattiva aggiornandone i dati (pertanto recuperandone il saldo).
-    IF EXISTS (
-        SELECT 1 FROM tessera_fedelta
-        WHERE codice_fiscale = _codice_fiscale
-          AND dismessa = TRUE
-    ) THEN
-        UPDATE tessera_fedelta
-        SET dismessa = FALSE,
-            data_richiesta = _data,
-            codice_negozio = _codice_negozio
-        WHERE codice_fiscale = _codice_fiscale AND dismessa = TRUE;
+    -- Se esiste già una tessera dismessa associata all'utente allora ne recupera il saldo.
+    SELECT saldo_punti
+    INTO _saldo_punti
+    FROM tessera_fedelta
+    WHERE codice_fiscale = _codice_fiscale
+      AND dismessa = TRUE
+    ORDER BY data_richiesta DESC
+    LIMIT 1;
+    IF FOUND THEN
+        INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
+        VALUES (_codice_negozio, _codice_fiscale, _data, _saldo_punti, FALSE);
         RETURN;
     END IF;
     -- Altrimenti crea una nuova tessera con saldo punti iniziale pari a 0.
