@@ -50,6 +50,13 @@ $rows = get_all_negozi();
                             <td><?= htmlspecialchars($r['nominativo_responsabile']) ?></td>
                             <td><?= htmlspecialchars($r['dismesso']) ?></td>
                             <td class="text-end">
+                                <?php if ($r['dismesso'] == 'f'): ?>
+                                    <form method="post" action="dismetti.php" class="d-inline">
+                                        <input type="hidden" name="codice_negozio"
+                                            value="<?= htmlspecialchars($r['codice_negozio']) ?>">
+                                        <button class="btn btn-sm btn-danger">Dismetti</button>
+                                    </form>
+                                <?php endif; ?>
                                 <form method="post" action="catalogo.php" class="d-inline">
                                     <input type="hidden" name="codice_negozio"
                                         value="<?= htmlspecialchars($r['codice_negozio']) ?>">
@@ -57,13 +64,6 @@ $rows = get_all_negozi();
                                         Gestisci prodotti
                                     </button>
                                 </form>
-                                <?php if (!$r['dismesso']): ?>
-                                    <form method="post" action="dismetti.php" class="d-inline">
-                                        <input type="hidden" name="codice_negozio"
-                                            value="<?= htmlspecialchars($r['codice_negozio']) ?>">
-                                        <button class="btn btn-sm btn-danger">Dismetti</button>
-                                    </form>
-                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach;
