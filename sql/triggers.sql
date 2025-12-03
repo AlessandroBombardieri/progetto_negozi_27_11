@@ -98,3 +98,20 @@ CREATE TRIGGER i_data_consegna_ordine_is_not_empty
 BEFORE INSERT ON ordine
 FOR EACH ROW
 EXECUTE FUNCTION data_consegna_ordine_is_not_empty();
+
+/* Si occupa di aggiornare la vista materializzata relativa alle tessere fedeltà dismesse attivandosi non appena un negozio venga dismesso. */
+CREATE OR REPLACE FUNCTION refresh_view_tessere_dismesse()
+RETURNS trigger AS $$
+BEGIN
+    -- Se il negozio è appena stato dismesso, aggiorna la MV
+    IF NEW.dismesso = TRUE AND OLD.dismesso = FALSE THEN
+        REFRESH MATERIALIZED VIEW view_tessere_dismesse;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER u_refresh_view_tessere_dismesse
+AFTER UPDATE OF dismesso ON negozio
+FOR EACH ROW
+EXECUTE FUNCTION refresh_view_tessere_dismesse();
