@@ -57,6 +57,13 @@ $rows = get_all_negozi();
                                         Gestisci prodotti
                                     </button>
                                 </form>
+                                <form method="post" action="dismetti.php" class="d-inline">
+                                    <input type="hidden" name="codice_negozio"
+                                        value="<?= htmlspecialchars($r['codice_negozio']) ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        Dismetti negozio
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach;

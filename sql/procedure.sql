@@ -296,7 +296,7 @@ $$ LANGUAGE plpgsql;
 Se il codice_negozio è NULL, allora i prodotti in vendita vengono semplicemente rimossi. */
 CREATE OR REPLACE PROCEDURE dismetti_negozio(
     _codice_negozio UUID,
-    _nuovo_negozio UUID DEFAULT NULL
+    _nuovo_codice_negozio UUID DEFAULT NULL
 ) AS $$
 DECLARE
     r RECORD;
@@ -309,7 +309,7 @@ BEGIN
     UPDATE tessera_fedelta
     SET dismessa = TRUE
     WHERE codice_negozio = _codice_negozio;
-    IF _nuovo_negozio IS NOT NULL THEN
+    IF _nuovo_codice_negozio IS NOT NULL THEN
         -- Se viene specificato alla procedura un secondo negozio presso il quale trasferire le scorte.
         FOR r IN SELECT * FROM vende WHERE codice_negozio = _codice_negozio LOOP
             -- Per ogni prodotto in vendita presso il negozio dismesso.
@@ -317,11 +317,11 @@ BEGIN
                 --  Se il prodotto fosse già presente allora ne viene incrementata la quantità.
                 UPDATE vende
                 SET quantita = quantita + r.quantita
-                WHERE codice_negozio = _nuovo_negozio AND codice_prodotto = r.codice_prodotto;
+                WHERE codice_negozio = _nuovo_codice_negozio AND codice_prodotto = r.codice_prodotto;
                 -- Altrimenti crea una nuova tupla di prodotto inedito in vendita.
                 IF NOT FOUND THEN
                     INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
-                    VALUES (_nuovo_negozio, r.codice_prodotto, r.prezzo, r.quantita);
+                    VALUES (_nuovo_codice_negozio, r.codice_prodotto, r.prezzo, r.quantita);
                 END IF;
             END;
         END LOOP;

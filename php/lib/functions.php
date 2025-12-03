@@ -522,3 +522,21 @@ function update_data_consegna_ordine($numero_ordine, $data_consegna)
     close_pg_connection($db);
     return $result;
 }
+
+/**
+ * M
+ * Dismetti un dato negozio. Otre a dismettere tutte le tessere dei clienti associati ad esso,
+ * è concesso specificare il codice_negozio di un secondo negozio presso il quale trasferire
+ * i prodotti ancora in vendita prima che vengano rimossi.
+ * Se il codice_negozio è NULL, allora i prodotti in vendita vengono semplicemente rimossi.
+ */
+function dismetti_negozio($codice_negozio, $nuovo_codice_negozio)
+{
+    $db = open_pg_connection();
+    $params = array($codice_negozio, $nuovo_codice_negozio);
+    $sql = "CALL dismetti_negozio($1, $2);";
+    $result = pg_prepare($db, 'dismetti_negozio', $sql);
+    $result = pg_execute($db, 'dismetti_negozio', $params);
+    close_pg_connection($db);
+    return $result;
+}
