@@ -15,12 +15,9 @@ if (!empty($_POST['codice_negozio'])) {
     $negozi = get_negozi_non_dismessi();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
-    $nuovo_codice_negozio = $_POST['nuovo_codice_negozio'];
-    if ($nuovo_codice_negozio === '') {
-        $err = "Compila tutti i campi";
-    }
+    $nuovo_codice_negozio = $_POST['nuovo_codice_negozio'] ?? '';
     if (!$err) {
-        if (dismetti_negozio($codice_negozio, $nuovo_codice_negozio)) {
+        if (dismetti_negozio($codice_negozio, $nuovo_codice_negozio ?: NULL)) {
             $ok = "Negozio dismesso con successo";
             $negozi = get_negozi_non_dismessi();
         } else {
@@ -59,15 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 
             <div class="col-md-7">
                 <label class="form-label">Trasferisci prodotti</label>
-                <select name="nuovo_codice_prodotto" class="form-select" required>
+                <select name="nuovo_codice_negozio" class="form-select">
                     <option value="" selected>Seleziona un negozio (opzionale)</option>
                     <?php foreach ($negozi as $n): ?>
-                        <option value="<?= htmlspecialchars($n['codice_negozio']) ?>">
-                            <?= htmlspecialchars($n['codice_negozio']) ?> — <?= htmlspecialchars($n['indirizzo']) ?>
-                        </option>
+                        <?php if ($n['codice_negozio'] !== $codice_negozio): ?>
+                            <option value="<?= htmlspecialchars($n['codice_negozio']) ?>">
+                                <?= htmlspecialchars($n['codice_negozio']) ?> — <?= htmlspecialchars($n['indirizzo']) ?>
+                            </option>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
-                <div class="form-text">Se non selezioni alcun negozio, i prodotti in vendita verranno definitivamente rimossi dal negozio dismesso.</div>
+                <div class="form-text">Se non selezioni alcun negozio, i prodotti in vendita verranno definitivamente
+                    rimossi dal negozio dismesso.</div>
             </div><br>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-sm btn-danger" name="submit_add" value="1">
