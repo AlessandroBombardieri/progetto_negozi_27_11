@@ -311,13 +311,13 @@ CREATE OR REPLACE PROCEDURE dismetti_negozio(
 DECLARE
     r RECORD;
 BEGIN
-    -- Imposto l'attributo dismesso del negozio in via di chiusura a true.
-    UPDATE negozio
-    SET dismesso = TRUE
-    WHERE codice_negozio = _codice_negozio;
     -- Revoco la validità delle tessere fedeltà relative ai clienti di tale negozio.
     UPDATE tessera_fedelta
     SET dismessa = TRUE
+    WHERE codice_negozio = _codice_negozio;
+    -- Imposto l'attributo dismesso del negozio in via di chiusura a true.
+    UPDATE negozio
+    SET dismesso = TRUE
     WHERE codice_negozio = _codice_negozio;
     IF _nuovo_codice_negozio IS NOT NULL THEN
         -- Se viene specificato alla procedura un secondo negozio presso il quale trasferire le scorte.
