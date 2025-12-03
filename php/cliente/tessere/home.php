@@ -6,9 +6,7 @@ session_start();
 if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
-if (!empty($_POST['codice_fiscale']) && !empty($_POST['codice_fiscale'])) {
-    $codice_fiscale = $_POST['codice_fiscale'];
-}
+$codice_fiscale = $_SESSION['utente']['codice_fiscale'];
 $rows = get_tessere_by_utente($codice_fiscale);
 ?>
 

@@ -49,12 +49,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Tessera</h5>
                         <p class="card-text text-muted">Vedi tessere attive e scadute, con saldo punti.</p>
-                        <form method="post" action="tessere/home.php" class="d-inline">
-                            <input type="hidden" name="codice_fiscale" value="<?= htmlspecialchars($r['codice_fiscale']) ?>">
-                            <button type="submit" class="btn btn-outline-primary"">
-                                Gestisci tessere
-                            </button>
-                        </form>
+                        <a class="btn btn-outline-primary" href="tessere/home.php">Gestisci tessere</a>
                     </div>
                 </div>
             </div>
