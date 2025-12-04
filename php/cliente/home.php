@@ -69,9 +69,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Prodotti</h5>
+                        <h5 class="card-title">Catalogo prodotti</h5>
                         <p class="card-text text-muted">Sfoglia i prodotti e aggiungili al carrello.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/prodotti.php">Apri</a>
+                        <a class="btn btn-outline-primary" href="/cliente/prodotti/home.php">Apri</a>
                     </div>
                 </div>
             </div>
