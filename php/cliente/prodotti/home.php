@@ -25,6 +25,7 @@ $codice_negozio = $_POST['codice_negozio'] ?? null;
 
 /*
  * 1) MOSTRA PRODOTTI PER NEGOZIO (submit_add)
+ *    → nessun controllo sul carrello qui, puoi cambiare negozio e solo vedere i prodotti
  */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
     if ($codice_negozio === '' || $codice_negozio === null) {
@@ -39,6 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 
 /*
  * 2) AGGIORNA CARRELLO (submit_add_)
+ *    → qui controlliamo il cambio negozio, ed eventualmente svuotiamo il carrello
+ *      SOLO se l'utente sta davvero aggiungendo prodotti (>0) da un altro negozio.
  */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
     if ($codice_negozio === '' || $codice_negozio === null) {
@@ -51,25 +54,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
     }
 
     if (!$err) {
+        // leggi quantità dal form in modo sicuro
+        $quantita = $_POST['qty'] ?? [];
+        if (!is_array($quantita)) {
+            $quantita = [];
+        }
+
+        // capisco se l'utente sta effettivamente aggiungendo qualcosa (>0) in questo submit
+        $sta_aggiungendo_da_nuovo_negozio = false;
+        foreach ($quantita as $q) {
+            if ((int)$q > 0) {
+                $sta_aggiungendo_da_nuovo_negozio = true;
+                break;
+            }
+        }
+
         // inizializza carrello se non esiste
         if (!isset($_SESSION['carrello'])) {
             $_SESSION['carrello'] = [
                 'codice_negozio' => $codice_negozio,
                 'items' => []
             ];
-        } elseif ($_SESSION['carrello']['codice_negozio'] !== $codice_negozio) {
-            // se il carrello era di un altro negozio, svuota e segnala
-            $_SESSION['carrello'] = [
-                'codice_negozio' => $codice_negozio,
-                'items' => []
-            ];
-            $_SESSION['carrello_svuotato'] = "Il carrello è stato svuotato perché hai cambiato negozio.";
-        }
+        } else {
+            $carrello_ha_items = !empty($_SESSION['carrello']['items']);
+            $negozio_carrello = $_SESSION['carrello']['codice_negozio'];
 
-        // leggi quantità dal form in modo sicuro
-        $quantita = $_POST['qty'] ?? [];
-        if (!is_array($quantita)) {
-            $quantita = [];
+            // Se il carrello ha già articoli di un altro negozio
+            // e l'utente STA aggiungendo quantità >0 per un nuovo negozio,
+            // allora svuotiamo e mostriamo il messaggio.
+            if (
+                $carrello_ha_items &&
+                $negozio_carrello !== $codice_negozio &&
+                $sta_aggiungendo_da_nuovo_negozio
+            ) {
+                $_SESSION['carrello'] = [
+                    'codice_negozio' => $codice_negozio,
+                    'items' => []
+                ];
+                $_SESSION['carrello_svuotato'] =
+                    "Attenzione: non è possibile selezionare prodotti appartenenti a negozi differenti. Procedendo, il carrello attuale verrà svuotato.";
+            } elseif (!$carrello_ha_items) {
+                // carrello vuoto: aggiorna solo il codice_negozio, nessun messaggio
+                $_SESSION['carrello']['codice_negozio'] = $codice_negozio;
+            }
+            // caso residuo: carrello con articoli dello stesso negozio → nessuna azione speciale
         }
 
         // indicizza i prodotti per codice_prodotto
@@ -113,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
 }
 
 /*
- * 3) Totale carrello corrente
+ * 3) Totale carrello corrente (dallo stato reale in sessione)
  */
 $totale_carrello = 0.0;
 if (isset($_SESSION['carrello'])) {
@@ -160,7 +188,7 @@ if (isset($_SESSION['carrello'])) {
         <div class="card-body">
             <h2 class="h5 mb-3">Prodotti per negozio</h2>
 
-            <!-- Form selezione negozio -->
+            <!-- Form selezione negozio (solo mostra prodotti) -->
             <form method="post" class="row g-2 mb-3">
                 <div class="col-md-8">
                     <select name="codice_negozio" class="form-select" required>
@@ -198,7 +226,7 @@ if (isset($_SESSION['carrello'])) {
                         <?php if ($rows): ?>
                             <?php foreach ($rows as $r): ?>
                                 <?php
-                                // valore mostrato nell'input = valore attuale nel carrello per QUESTO negozio
+                                // mostra quantità solo se il carrello è per questo negozio
                                 $in_carrello = 0;
                                 if (isset($_SESSION['carrello'])
                                     && $_SESSION['carrello']['codice_negozio'] === $codice_negozio
