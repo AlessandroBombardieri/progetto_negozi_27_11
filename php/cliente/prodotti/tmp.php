@@ -1,5 +1,3 @@
-$_SESSION['carrello_svuotato'] = "Attenzione: è possibile effettuare un ordine presso un unico negozio, se selezionerai prodotti presso un negozio differente, il carrello attuale verrà svuotato.";
-
 <?php
 ini_set("display_errors", "On");
 ini_set("error_reporting", E_ALL);
