@@ -9,14 +9,7 @@ if (!isset($_SESSION['utente'])) {
 $ok = $err = null;
 $rows = [];
 $negozi = get_negozi_non_dismessi();
-$carrello_svuotato_msg = null;
-if (isset($_SESSION['carrello_svuotato'])) {
-    $carrello_svuotato_msg = $_SESSION['carrello_svuotato'];
-    unset($_SESSION['carrello_svuotato']);
-}
-//$codice_negozio = $_POST['codice_negozio'] ?? null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
-    //
     $codice_negozio = $_POST['codice_negozio'];
     if ($codice_negozio === '' || $codice_negozio === null) {
         $err = "Compila tutti i campi";
@@ -27,12 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
         }
     }
 }
-
-/*
- * 2) AGGIORNA CARRELLO (submit_add_)
- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
-    //
     $codice_negozio = $_POST['codice_negozio'];
     if ($codice_negozio === '' || $codice_negozio === null) {
         $err = "Compila tutti i campi";
@@ -42,69 +30,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add_'])) {
             $err = "Nessun prodotto per il negozio selezionato.";
         }
     }
-
     if (!$err) {
-        // inizializza carrello se non esiste
         if (!isset($_SESSION['carrello'])) {
             $_SESSION['carrello'] = [
                 'codice_negozio' => $codice_negozio,
                 'items' => []
             ];
         } elseif ($_SESSION['carrello']['codice_negozio'] !== $codice_negozio) {
-            // se il carrello era di un altro negozio, svuota e segnala
             $_SESSION['carrello'] = [
                 'codice_negozio' => $codice_negozio,
                 'items' => []
             ];
-            $_SESSION['carrello_svuotato'] = "Il carrello è stato svuotato perché hai cambiato negozio.";
         }
-
-        // leggi quantità dal form in modo sicuro
         $quantita = $_POST['qty'] ?? [];
         if (!is_array($quantita)) {
             $quantita = [];
         }
-
-        // indicizza i prodotti per codice_prodotto
         $prodotti_by_id = [];
         foreach ($rows as $r) {
             $prodotti_by_id[$r['codice_prodotto']] = $r;
         }
-
         foreach ($quantita as $codice_prodotto => $qty) {
             $qty = (int) $qty;
             if ($qty < 0) {
                 $qty = 0;
             }
-
             if ($qty > 0) {
-                // il prodotto deve appartenere al negozio corrente
                 if (!isset($prodotti_by_id[$codice_prodotto])) {
                     continue;
                 }
                 $prod = $prodotti_by_id[$codice_prodotto];
-
-                // limita alle scorte disponibili
                 $max_disponibile = (int) $prod['quantita'];
                 if ($qty > $max_disponibile) {
                     $qty = $max_disponibile;
                 }
-
                 $_SESSION['carrello']['items'][$codice_prodotto] = [
                     'nome' => $prod['nome'],
                     'prezzo' => (float) $prod['prezzo'],
                     'qty' => $qty,
                 ];
             } else {
-                // qty = 0 → rimuovi dal carrello
                 unset($_SESSION['carrello']['items'][$codice_prodotto]);
             }
         }
-
         $ok = "Carrello aggiornato.";
     }
 }
-
 $totale_carrello = 0.0;
 if (isset($_SESSION['carrello'])) {
     foreach ($_SESSION['carrello']['items'] as $item) {
@@ -136,15 +107,13 @@ if (isset($_SESSION['carrello'])) {
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($err) ?></div>
         <?php endif; ?>
-        <?php if ($carrello_svuotato_msg): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($carrello_svuotato_msg) ?></div>
-        <?php endif; ?>
         <?php if ($ok && !$err): ?>
             <div class="alert alert-success"><?= htmlspecialchars($ok) ?></div>
         <?php endif; ?>
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h2 class="h5 mb-3">Prodotti per negozio</h2>
+                <h1 class="h6 mb-3 text-muted">Attenzione: sono accettati esclusivamente ordini presso negozi singoli.</h1>
                 <form method="post" class="row g-2 mb-3">
                     <div class="col-md-8">
                         <select name="codice_negozio" class="form-select" required>
@@ -179,7 +148,6 @@ if (isset($_SESSION['carrello'])) {
                                 <?php if ($rows): ?>
                                     <?php foreach ($rows as $r): ?>
                                         <?php
-                                        // valore mostrato nell'input = valore attuale nel carrello per QUESTO negozio
                                         $in_carrello = 0;
                                         if (
                                             isset($_SESSION['carrello'])
@@ -209,7 +177,6 @@ if (isset($_SESSION['carrello'])) {
                                 <?php endif; ?>
                             </tbody>
                         </table>
-
                         <?php if ($rows): ?>
                             <div class="mt-3 text-end">
                                 <button class="btn btn-success" type="submit" name="submit_add_" value="1">
