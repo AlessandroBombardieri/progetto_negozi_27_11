@@ -20,15 +20,19 @@ BEGIN
     SELECT saldo_punti INTO _punti_correnti
     FROM tessera_fedelta
     WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
+    -- Se l'utente non ha tessere attive, non vi è alcuno sconto applicabile
+    IF NOT FOUND THEN
+        RETURN;
+    END IF;
     -- Se i punti correnti sono almeno 100, allora proponi una sconto pari al 5%
     IF _punti_correnti >= 100 THEN
         RETURN QUERY SELECT 100, 5.0;
     END IF;
-    -- Se i punti correnti sono almeno 200, allora proponi una sconto pari al 15%
+    -- Se i punti correnti sono almeno 200, allora proponi un ulteriore sconto pari al 15%
     IF _punti_correnti >= 200 THEN
         RETURN QUERY SELECT 200, 15.0;
     END IF;
-    -- Se i punti correnti sono almeno 300, allora proponi una sconto pari al 30%
+    -- Se i punti correnti sono almeno 300, allora proponi un ulteriore sconto pari al 30%
     IF _punti_correnti >= 300 THEN
         RETURN QUERY SELECT 300, 30.0;
     END IF;
