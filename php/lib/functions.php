@@ -586,3 +586,41 @@ function get_tessera_non_dismessa_by_utente($codice_fiscale): array
     close_pg_connection($db);
     return $tessere;
 }
+
+/**
+ * M
+ * Restituisce gli sconti applicabili a seconda del saldo punti presente sulla tessera fedeltà non dismessa dell'utente, se presente.
+ */
+function get_sconti_applicabili($codice_fiscale): array
+{
+    $db = open_pg_connection();
+    $params = array($codice_fiscale);
+    $sql = "SELECT * FROM get_sconti_applicabili($1);";
+    $result = pg_prepare($db, 'get_sconti_applicabili', $sql);
+    $result = pg_execute($db, 'get_sconti_applicabili', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $tessere = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $tessere[] = $row;
+    }
+    close_pg_connection($db);
+    return $tessere;
+}
+
+/**
+ * M
+ * Applica lo sconto selezionato identificato tramite la quantità di punti utilizzati sul totale della relativa fattura.
+ */
+function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizzati)
+{
+    $db = open_pg_connection();
+    $params = array($codice_fattura, $codice_fiscale, $punti_utilizzati);
+    $sql = "CALL update_totale_fattura($1, $2, $3);";
+    $result = pg_prepare($db, 'update_totale_fattura', $sql);
+    $result = pg_execute($db, 'update_totale_fattura', $params);
+    close_pg_connection($db);
+    return $result;
+}

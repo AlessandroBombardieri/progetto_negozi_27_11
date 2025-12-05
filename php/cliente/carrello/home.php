@@ -1,17 +1,26 @@
 <?php
 ini_set("display_errors", "On");
 ini_set("error_reporting", E_ALL);
-include_once('../../lib/functions.php'); // adatta il path se serve
+
+include_once('../../lib/functions.php'); // adatta il path se necessario
 session_start();
+
 if (!isset($_SESSION['utente']) || $_SESSION['utente']['ruolo'] !== 'cliente') {
     redirect('../home.php');
 }
+
 $ok = $err = null;
+
+// Stato carrello da sessione
 $carrello = $_SESSION['carrello'] ?? null;
 $codice_negozio = $carrello['codice_negozio'] ?? null;
 $items = $carrello['items'] ?? [];
 $carrello_vuoto = empty($items);
+
+// Utente
 $codice_fiscale = $_SESSION['utente']['codice_fiscale'] ?? null;
+
+// Helper: totale carrello
 function calcola_totale_carrello(array $items): float {
     $tot = 0.0;
     foreach ($items as $it) {
@@ -19,7 +28,13 @@ function calcola_totale_carrello(array $items): float {
     }
     return $tot;
 }
+
+/*
+ * 1) Gestione POST
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Svuota carrello
     if (isset($_POST['svuota'])) {
         unset($_SESSION['carrello']);
         $carrello = null;
@@ -27,40 +42,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $carrello_vuoto = true;
         $ok = "Carrello svuotato.";
     }
+
+    // Aggiorna quantità / rimuovi singoli
     elseif (isset($_POST['aggiorna'])) {
         if (!$codice_negozio) {
             $err = "Errore: nessun negozio associato al carrello.";
         } else {
+            // Ricarico i prodotti per validare prezzi/stock
             $rows = get_prodotti_by_negozio($codice_negozio);
             $prodotti_by_id = [];
             foreach ($rows as $r) {
                 $prodotti_by_id[$r['codice_prodotto']] = $r;
             }
+
             $nuovi_items = [];
             $quantita = $_POST['qty'] ?? [];
             if (!is_array($quantita)) {
                 $quantita = [];
             }
+
             foreach ($quantita as $codice_prodotto => $qty) {
                 $qty = (int)$qty;
-                if ($qty < 0) $qty = 0;
-                if ($qty === 0) {
-                    continue;
+                if ($qty <= 0) {
+                    continue; // rimosso
                 }
+
                 if (!isset($prodotti_by_id[$codice_prodotto])) {
-                    continue;
+                    continue; // prodotto non più valido per questo negozio
                 }
                 $prod = $prodotti_by_id[$codice_prodotto];
                 $max_disponibile = (int)$prod['quantita'];
                 if ($qty > $max_disponibile) {
                     $qty = $max_disponibile;
                 }
+
                 $nuovi_items[$codice_prodotto] = [
                     'nome'   => $prod['nome'],
                     'prezzo' => (float)$prod['prezzo'],
                     'qty'    => $qty,
                 ];
             }
+
             if (empty($nuovi_items)) {
                 unset($_SESSION['carrello']);
                 $carrello = null;
@@ -75,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+
+    // Conferma acquisto
     elseif (isset($_POST['acquista'])) {
         if ($carrello_vuoto) {
             $err = "Il carrello è vuoto.";
@@ -84,116 +108,134 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $err = "Errore: utente non riconosciuto.";
         } else {
             $totale = calcola_totale_carrello($items);
-            $tessera = get_tessera_non_dismessa_by_utente($codice_fiscale);
+
+            // Tessera attiva (se serve a livello di procedura SQL)
+            $tessera = get_tessera_non_dismessa_by_utente($codice_fiscale); // funzione che hai/puoi avere in functions.php
             if (!$tessera) {
-                $err = "Non hai una tessera fedeltà attiva.";
+                $err = "Non hai una tessera fedeltà attiva per questo negozio.";
             } else {
-                $saldo_punti = (int)$tessera['saldo_punti'];
+                // Sconto scelto (sarà passato a update_totale_fattura)
                 $sconto_perc = isset($_POST['sconto']) ? (int)$_POST['sconto'] : 0;
-                $punti_da_scalare = 0;
-                if ($sconto_perc === 5)  $punti_da_scalare = 100;
-                if ($sconto_perc === 15) $punti_da_scalare = 200;
-                if ($sconto_perc === 30) $punti_da_scalare = 300;
-                if ($punti_da_scalare > 0 && $saldo_punti < $punti_da_scalare) {
-                    $err = "Punti insufficienti per lo sconto selezionato.";
-                } else {
-                    $sconto_euro = $totale * ($sconto_perc / 100.0);
-                    if ($sconto_euro > 100) {
-                        $sconto_euro = 100;
+
+                $db = open_pg_connection();
+                pg_query($db, "BEGIN");
+
+                try {
+                    // 1) Crea fattura con totale (senza applicare sconto qui)
+                    $sql_fatt = "
+                        INSERT INTO fattura(data_acquisto, totale, sconto_percentuale, totale_pagato, codice_fiscale)
+                        VALUES (CURRENT_DATE, $1, NULL, $1, $2)
+                        RETURNING codice_fattura
+                    ";
+                    $res_f = pg_query_params($db, $sql_fatt, [$totale, $codice_fiscale]);
+                    if (!$res_f) {
+                        throw new Exception(pg_last_error($db));
                     }
-                    $totale_pagato = $totale - $sconto_euro;
-                    $db = dbConnection();
-                    pg_query($db, "BEGIN");
-                    try {
-                        $sql_fatt = "INSERT INTO fattura(data_acquisto, totale, sconto_percentuale, totale_pagato, codice_fiscale)
-                                     VALUES (CURRENT_DATE, $1, $2, $3, $4)
-                                     RETURNING codice_fattura";
-                        $res_f = pg_query_params($db, $sql_fatt, [
-                            $totale,
-                            $sconto_perc ?: null,
-                            $totale_pagato,
-                            $codice_fiscale
+                    $fatt = pg_fetch_assoc($res_f);
+                    $codice_fattura = $fatt['codice_fattura'];
+
+                    // 2) Inserisci righe emette + aggiorna stock
+                    foreach ($items as $codice_prodotto => $it) {
+                        $prezzo = $it['prezzo'];
+                        $qty    = $it['qty'];
+
+                        // riga emette
+                        $sql_em = "
+                            INSERT INTO emette(codice_negozio, codice_prodotto, codice_fattura, prezzo, quantita_acquistata)
+                            VALUES ($1, $2, $3, $4, $5)
+                        ";
+                        $ok_em = pg_query_params($db, $sql_em, [
+                            $codice_negozio,
+                            $codice_prodotto,
+                            $codice_fattura,
+                            $prezzo,
+                            $qty
                         ]);
-                        if (!$res_f) {
+                        if (!$ok_em) {
                             throw new Exception(pg_last_error($db));
                         }
-                        $fatt = pg_fetch_assoc($res_f);
-                        $codice_fattura = $fatt['codice_fattura'];
-                        foreach ($items as $codice_prodotto => $it) {
-                            $prezzo = $it['prezzo'];
-                            $qty    = $it['qty'];
-                            $sql_em = "INSERT INTO emette(codice_negozio, codice_prodotto, codice_fattura, prezzo, quantita_acquistata)
-                                       VALUES ($1, $2, $3, $4, $5)";
-                            $ok_em = pg_query_params($db, $sql_em, [
-                                $codice_negozio,
-                                $codice_prodotto,
-                                $codice_fattura,
-                                $prezzo,
-                                $qty
-                            ]);
-                            if (!$ok_em) {
-                                throw new Exception(pg_last_error($db));
-                            }
-                            $sql_stock = "UPDATE vende
-                                          SET quantita = quantita - $1
-                                          WHERE codice_negozio = $2 AND codice_prodotto = $3";
-                            $ok_st = pg_query_params($db, $sql_stock, [
-                                $qty,
-                                $codice_negozio,
-                                $codice_prodotto
-                            ]);
-                            if (!$ok_st) {
-                                throw new Exception(pg_last_error($db));
-                            }
+
+                        // decremento stock da vende
+                        $sql_stock = "
+                            UPDATE vende
+                            SET quantita = quantita - $1
+                            WHERE codice_negozio = $2 AND codice_prodotto = $3
+                        ";
+                        $ok_st = pg_query_params($db, $sql_stock, [
+                            $qty,
+                            $codice_negozio,
+                            $codice_prodotto
+                        ]);
+                        if (!$ok_st) {
+                            throw new Exception(pg_last_error($db));
                         }
-                        if ($punti_da_scalare > 0) {
-                            $sql_pts = "UPDATE tessera_fedelta
-                                        SET saldo_punti = saldo_punti - $1
-                                        WHERE codice_fiscale = $2
-                                          AND codice_negozio = $3
-                                          AND dismessa = FALSE";
-                            $ok_pts = pg_query_params($db, $sql_pts, [
-                                $punti_da_scalare,
-                                $codice_fiscale,
-                                $codice_negozio
-                            ]);
-                            if (!$ok_pts) {
-                                throw new Exception(pg_last_error($db));
-                            }
-                        }
-                        pg_query($db, "COMMIT");
-                        pg_close($db);
-                        unset($_SESSION['carrello']);
-                        $carrello_vuoto = true;
-                        $items = [];
-                        $ok = "Acquisto completato. Codice fattura: " . htmlspecialchars($codice_fattura);
-                    } catch (Exception $e) {
-                        pg_query($db, "ROLLBACK");
-                        pg_close($db);
-                        $err = "Errore durante la conferma dell'acquisto: " . $e->getMessage();
                     }
+
+                    // 3) Chiama la tua funzione/procedura SQL update_totale_fattura
+                    //    QUI devi usare la firma esatta di update_totale_fattura che hai definito.
+                    //    Esempio (da adattare):
+                    //
+                    //    SELECT update_totale_fattura(codice_fattura, codice_fiscale, codice_negozio, sconto_percentuale);
+                    //
+                    $sql_update = "SELECT update_totale_fattura($1, $2, $3, $4)";
+                    $res_upd = pg_query_params($db, $sql_update, [
+                        $codice_fattura,
+                        $codice_fiscale,
+                        $codice_negozio,
+                        $sconto_perc
+                    ]);
+                    if (!$res_upd) {
+                        throw new Exception(pg_last_error($db));
+                    }
+
+                    pg_query($db, "COMMIT");
+                    close_pg_connection($db);
+
+                    unset($_SESSION['carrello']);
+                    $carrello_vuoto = true;
+                    $items = [];
+
+                    $ok = "Acquisto completato. Codice fattura: " . htmlspecialchars($codice_fattura);
+                } catch (Exception $e) {
+                    pg_query($db, "ROLLBACK");
+                    close_pg_connection($db);
+                    $err = "Errore durante la conferma dell'acquisto: " . $e->getMessage();
                 }
             }
         }
     }
 }
 
-// Ricalcola totale per la vista
+// 2) Stato per la vista
 $totale_carrello = calcola_totale_carrello($items);
 
-// Calcolo sconti disponibili in base al saldo punti (solo per vista)
+// saldo punti + sconti applicabili usando get_sconti_applicabili
 $saldo_punti = 0;
-$tessera = null;
-if (!$carrello_vuoto && $codice_fiscale) {
+$opzioni_sconto = [0]; // 0 = nessuno sconto
+
+if (!$carrello_vuoto && $codice_negozio && $codice_fiscale) {
+    // Recupera tessera e saldo per info
     $tessera = get_tessera_non_dismessa_by_utente($codice_fiscale);
     if ($tessera) {
         $saldo_punti = (int)$tessera['saldo_punti'];
     }
+
+    // Usa la tua funzione SQL get_sconti_applicabili
+    // Devi adattare la firma esatta: qui suppongo (codice_fiscale, codice_negozio)
+    $db2 = open_pg_connection();
+    $sql_sconti = "SELECT * FROM get_sconti_applicabili($1, $2)";
+    $res_s = pg_query_params($db2, $sql_sconti, [$codice_fiscale, $codice_negozio]);
+    if ($res_s) {
+        while ($row = pg_fetch_assoc($res_s)) {
+            // supponiamo che la funzione ritorni una colonna 'percentuale'
+            $perc = (int)$row['percentuale'];
+            if (!in_array($perc, $opzioni_sconto, true)) {
+                $opzioni_sconto[] = $perc;
+            }
+        }
+    }
+    close_pg_connection($db2);
 }
-$opzioni_sconto = [0]; // 0 = nessuno sconto
-if ($saldo_punti >= 100) $opzioni_sconto[] = 5;
-if ($saldo_punti >= 200) $opzioni_sconto[] = 15;
-if ($saldo_punti >= 300) $opzioni_sconto[] = 30;
 ?>
 <!doctype html>
 <html lang="it">
@@ -229,6 +271,7 @@ if ($saldo_punti >= 300) $opzioni_sconto[] = 30;
     <?php if ($carrello_vuoto): ?>
         <div class="alert alert-info">Il carrello è vuoto.</div>
     <?php else: ?>
+        <!-- Form aggiornamento carrello -->
         <form method="post" class="card shadow-sm mb-4">
             <div class="card-body">
                 <h2 class="h5 mb-3">Prodotti nel carrello</h2>
@@ -254,9 +297,7 @@ if ($saldo_punti >= 300) $opzioni_sconto[] = 30;
                                            min="0"
                                            value="<?= (int)$it['qty'] ?>">
                                 </td>
-                                <td>
-                                    <?= number_format($it['prezzo'] * $it['qty'], 2, ',', '.') ?> €
-                                </td>
+                                <td><?= number_format($it['prezzo'] * $it['qty'], 2, ',', '.') ?> €</td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -275,12 +316,13 @@ if ($saldo_punti >= 300) $opzioni_sconto[] = 30;
             </div>
         </form>
 
+        <!-- Form scelta sconto + acquisto -->
         <form method="post" class="card shadow-sm">
             <div class="card-body">
                 <h2 class="h5 mb-3">Sconti disponibili</h2>
                 <p class="mb-1">Saldo punti tessera: <strong><?= (int)$saldo_punti ?></strong></p>
                 <p class="text-muted small mb-3">
-                    Soglie: 100 punti → 5%, 200 → 15%, 300 → 30%. Lo sconto massimo applicabile è 100 €.
+                    Gli sconti mostrati sono calcolati dalla funzione get_sconti_applicabili.
                 </p>
 
                 <div class="mb-3">
@@ -291,9 +333,7 @@ if ($saldo_punti >= 300) $opzioni_sconto[] = 30;
                                    name="sconto"
                                    id="sconto_<?= $perc ?>"
                                    value="<?= $perc ?>"
-                                   <?= $perc === 0 ? 'checked' : '' ?>
-                                   <?= ($perc > 0 && $saldo_punti < ($perc === 5 ? 100 : ($perc === 15 ? 200 : 300))) ? 'disabled' : '' ?>
-                            >
+                                   <?= $perc === 0 ? 'checked' : '' ?>>
                             <label class="form-check-label" for="sconto_<?= $perc ?>">
                                 <?= $perc === 0 ? 'Nessuno sconto' : $perc . '%' ?>
                             </label>
