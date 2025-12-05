@@ -8,16 +8,11 @@ if (!isset($_SESSION['utente']) || $_SESSION['utente']['ruolo'] !== 'cliente') {
     redirect('../home.php');
 }
 $ok = $err = null;
-// Stato carrello da sessione
 $carrello = $_SESSION['carrello'] ?? null;
 $codice_negozio = $carrello['codice_negozio'] ?? null;
 $items = $carrello['items'] ?? [];
 $carrello_vuoto = empty($items);
-
-// Utente
 $codice_fiscale = $_SESSION['utente']['codice_fiscale'] ?? null;
-
-// Helper: totale carrello
 function calcola_totale_carrello(array $items): float
 {
     $tot = 0.0;
@@ -26,13 +21,7 @@ function calcola_totale_carrello(array $items): float
     }
     return $tot;
 }
-
-/*
- * 1) Gestione POST
- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // Svuota carrello
     if (isset($_POST['svuota'])) {
         unset($_SESSION['carrello']);
         $carrello = null;
@@ -40,34 +29,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $carrello_vuoto = true;
         $ok = "Carrello svuotato.";
     }
-
-    // Aggiorna quantità / rimuovi singoli
     elseif (isset($_POST['aggiorna'])) {
         if (!$codice_negozio) {
             $err = "Errore: nessun negozio associato al carrello.";
         } else {
-            // Ricarico i prodotti per validare prezzi/stock
             $rows = get_prodotti_by_negozio($codice_negozio);
             $prodotti_by_id = [];
             foreach ($rows as $r) {
                 $prodotti_by_id[$r['codice_prodotto']] = $r;
             }
-
             $nuovi_items = [];
             $quantita = $_POST['qty'] ?? [];
             if (!is_array($quantita)) {
                 $quantita = [];
             }
-
             foreach ($quantita as $codice_prodotto => $qty) {
                 $qty = (int) $qty;
                 if ($qty <= 0) {
-                    // rimosso dal carrello
                     continue;
                 }
-
                 if (!isset($prodotti_by_id[$codice_prodotto])) {
-                    // prodotto non più valido per questo negozio
                     continue;
                 }
                 $prod = $prodotti_by_id[$codice_prodotto];
@@ -75,14 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($qty > $max_disponibile) {
                     $qty = $max_disponibile;
                 }
-
                 $nuovi_items[$codice_prodotto] = [
                     'nome' => $prod['nome'],
                     'prezzo' => (float) $prod['prezzo'],
                     'qty' => $qty,
                 ];
             }
-
             if (empty($nuovi_items)) {
                 unset($_SESSION['carrello']);
                 $carrello = null;
@@ -97,8 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
-    // Conferma acquisto
     elseif (isset($_POST['acquista'])) {
         if ($carrello_vuoto) {
             $err = "Il carrello è vuoto.";
@@ -108,28 +85,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $err = "Errore: utente non riconosciuto.";
         } else {
             $totale = calcola_totale_carrello($items);
-
-            // Tessera non dismessa dell'utente (funzione già esistente)
             $tessere = get_tessera_non_dismessa_by_utente($codice_fiscale);
             if (empty($tessere)) {
                 $err = "Non hai una tessera fedeltà attiva.";
             } else {
-                // ipotizzo una sola tessera attiva; prendo la prima
                 $tessera = $tessere[0];
                 $saldo_punti = (int) $tessera['saldo_punti'];
-
-                // Sconto scelto: nel tuo modello update_totale_fattura usa "punti_utilizzati",
-                // quindi dal radio prendo direttamente i punti da usare (0, 100, 200, 300)
                 $punti_utilizzati = isset($_POST['sconto']) ? (int) $_POST['sconto'] : 0;
-
                 if ($punti_utilizzati > $saldo_punti) {
                     $err = "Punti insufficienti per lo sconto selezionato.";
                 } else {
                     $db = open_pg_connection();
                     pg_query($db, "BEGIN");
-
                     try {
-                        // 1) Crea fattura con totale = totale_pagato iniziale (nessuno sconto ancora applicato)
                         $sql_fatt = "
                             INSERT INTO fattura(data_acquisto, totale, sconto_percentuale, totale_pagato, codice_fiscale)
                             VALUES (CURRENT_DATE, $1, NULL, $1, $2)
@@ -141,13 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         $fatt = pg_fetch_assoc($res_f);
                         $codice_fattura = $fatt['codice_fattura'];
-
-                        // 2) Inserisci righe emette + aggiorna stock
                         foreach ($items as $codice_prodotto => $it) {
                             $prezzo = $it['prezzo'];
                             $qty = $it['qty'];
-
-                            // riga emette
                             $sql_em = "
                                 INSERT INTO emette(codice_negozio, codice_prodotto, codice_fattura, prezzo, quantita_acquistata)
                                 VALUES ($1, $2, $3, $4, $5)
@@ -162,8 +126,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (!$ok_em) {
                                 throw new Exception(pg_last_error($db));
                             }
-
-                            // decremento stock da vende
                             $sql_stock = "
                                 UPDATE vende
                                 SET quantita = quantita - $1
@@ -178,23 +140,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 throw new Exception(pg_last_error($db));
                             }
                         }
-
-                        // 3) Applica lo sconto selezionato e aggiorna totale/ punti
-                        //    usando la tua procedura update_totale_fattura
                         if ($punti_utilizzati > 0) {
                             $res_upd = update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizzati);
                             if ($res_upd === false) {
                                 throw new Exception("Impossibile applicare lo sconto selezionato.");
                             }
                         }
-
                         pg_query($db, "COMMIT");
                         close_pg_connection($db);
-
                         unset($_SESSION['carrello']);
                         $carrello_vuoto = true;
                         $items = [];
-
                         $ok = "Acquisto completato. Codice fattura: " . htmlspecialchars($codice_fattura);
                     } catch (Exception $e) {
                         pg_query($db, "ROLLBACK");
@@ -206,27 +162,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-// 2) Stato per la vista
 $totale_carrello = calcola_totale_carrello($items);
-
-// saldo punti + sconti applicabili usando le tue funzioni
 $saldo_punti = 0;
 $opzioni_sconto = [0]; // 0 = nessuno sconto
-
 if (!$carrello_vuoto && $codice_fiscale) {
-    // tessera (può essercene anche più di una, ma di solito 1)
     $tessere = get_tessera_non_dismessa_by_utente($codice_fiscale);
     if (!empty($tessere)) {
         $saldo_punti = (int) $tessere[0]['saldo_punti'];
     }
-
-    // sconti applicabili: funzione già presente
     $sconti = get_sconti_applicabili($codice_fiscale);
     foreach ($sconti as $s) {
-        // ipotizzo che la funzione ritorni la colonna "punti_utilizzati" o simile;
-        // se il nome è diverso, adatta qui.
-        // ESEMPI POSSIBILI: $s['punti'], $s['punti_utilizzati'], $s['soglia'], ecc.
         if (isset($s['punti_utilizzati'])) {
             $punti = (int) $s['punti_utilizzati'];
         } elseif (isset($s['punti'])) {
