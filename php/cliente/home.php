@@ -82,7 +82,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Carrello</h5>
                         <p class="card-text text-muted">Rivedi articoli o procedi all’ordine.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/carrello.php">Apri</a>
+                        <a class="btn btn-outline-primary" href="/cliente/carrello/home.php">Apri</a>
                     </div>
                 </div>
             </div>

@@ -600,6 +600,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi alla tessere fedeltà non dismessa di un utente. */
+CREATE OR REPLACE FUNCTION get_tessera_non_dismessa_by_utente(_codice_fiscale VARCHAR)
+RETURNS TABLE (
+    codice_tessera UUID,
+    saldo_punti    INT8,
+    codice_negozio UUID,
+    data_richiesta  DATE
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.codice_tessera,
+        t.saldo_punti,
+        t.codice_negozio,
+        t.data_richiesta
+    FROM tessera_fedelta AS t
+    WHERE t.codice_fiscale = _codice_fiscale AND t.dismessa = FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi alle tessere fedeltà emesse da un negozio dismesso. */
 CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio uuid)
 RETURNS TABLE (

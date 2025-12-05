@@ -563,3 +563,26 @@ function get_tessere_by_utente($codice_fiscale): array
     close_pg_connection($db);
     return $tessere;
 }
+
+/**
+ * M
+ * Restituisce i dati della tessera fedeltà non dismessa associate ad un dato utente, se presente.
+ */
+function get_tessera_non_dismessa_by_utente($codice_fiscale): array
+{
+    $db = open_pg_connection();
+    $params = array($codice_fiscale);
+    $sql = "SELECT * FROM get_tessera_non_dismessa_by_utente($1);";
+    $result = pg_prepare($db, 'get_tessera_non_dismessa_by_utente', $sql);
+    $result = pg_execute($db, 'get_tessera_non_dismessa_by_utente', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $tessere = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $tessere[] = $row;
+    }
+    close_pg_connection($db);
+    return $tessere;
+}
