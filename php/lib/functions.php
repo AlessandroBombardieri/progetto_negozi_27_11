@@ -653,3 +653,26 @@ function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio,
     close_pg_connection($db);
     return $row['codice_fattura'] ?? null;
 }
+
+/**
+ * M
+ * Restituisce le fatture relative agli acquisti di un dato utente.
+ */
+function get_fatture_by_utente($codice_fiscale): array
+{
+    $db = open_pg_connection();
+    $params = array($codice_fiscale);
+    $sql = "SELECT * FROM get_fatture_by_utente($1);";
+    $result = pg_prepare($db, 'get_fatture_by_utente', $sql);
+    $result = pg_execute($db, 'get_fatture_by_utente', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $fatture = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $fatture[] = $row;
+    }
+    close_pg_connection($db);
+    return $fatture;
+}

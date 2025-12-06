@@ -60,7 +60,7 @@ $u = $_SESSION['utente'];
                     <div class="card-body">
                         <h5 class="card-title">Fatture</h5>
                         <p class="card-text text-muted">Storico dei tuoi acquisti.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/fatture.php">Vedi fatture</a>
+                        <a class="btn btn-outline-primary" href="fatture/home.php">Vedi fatture</a>
                     </div>
                 </div>
             </div>
