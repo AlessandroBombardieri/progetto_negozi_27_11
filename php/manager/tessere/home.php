@@ -173,6 +173,7 @@ $rows__ = get_tesserati_premium();
                                 <th>Codice tessera</th>
                                 <th>Codice negozio</th>
                                 <th>Saldo punti</th>
+                                <th>Data richiesta</th>
                                 <th>Dismessa</th>
                             </tr>
                         </thead>
@@ -187,6 +188,7 @@ $rows__ = get_tesserati_premium();
                                     <td><?= htmlspecialchars($r['codice_negozio']) ?></td>
                                     <td><?= htmlspecialchars($r['saldo_punti']) ?></td>
                                     <td><?= htmlspecialchars($r['data_richiesta']) ?></td>
+                                    <td><?= htmlspecialchars($r['dismessa']) ?></td>
                                 </tr>
                             <?php endforeach;
                             if (!$rows__): ?>

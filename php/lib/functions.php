@@ -625,7 +625,6 @@ function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizza
     return $result;
 }
 
-
 /*
  * ...
  */
