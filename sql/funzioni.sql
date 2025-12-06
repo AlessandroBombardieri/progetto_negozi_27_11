@@ -507,6 +507,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di ottenere i dati relativi a tutte le fatture. */
+CREATE OR REPLACE FUNCTION get_all_fatture()
+RETURNS TABLE (
+    codice_fattura UUID,
+    codice_fiscale VARCHAR,
+    codice_negozio UUID,
+    codice_prodotto UUID,
+    data_acquisto DATE,
+    totale FLOAT,
+    totale_pagato FLOAT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.codice_fattura,
+        f.codice_fiscale,
+        e.codice_negozio,
+        e.codice_prodotto,
+        f.data_acquisto,
+        f.totale,
+        f.totale_pagato
+    FROM emette e JOIN fattura f ON f.codice_fattura = e.codice_fattura
+    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di ottenere i dati relativi alle fatture che coinvolgono un utente. */
 CREATE OR REPLACE FUNCTION get_fatture_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
@@ -525,7 +551,8 @@ BEGIN
         f.sconto_percentuale,
         f.totale_pagato
     FROM fattura AS f
-    WHERE f.codice_fiscale = _codice_fiscale;
+    WHERE f.codice_fiscale = _codice_fiscale
+    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
 END;
 $$ LANGUAGE plpgsql;
 

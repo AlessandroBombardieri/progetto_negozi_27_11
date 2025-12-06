@@ -465,7 +465,7 @@ function add_tessera($codice_negozio, $codice_fiscale)
 
 /**
  * M
- * Restituisce i dati di tessere associate a clienti premium, ovvero con un saldo punti superiore a 300 punti.
+ * Restituisce i dati delle tessere associate a clienti premium, ovvero con un saldo punti superiore a 300 punti.
  */
 function get_tesserati_premium(): array
 {
@@ -665,6 +665,28 @@ function get_fatture_by_utente($codice_fiscale): array
     $sql = "SELECT * FROM get_fatture_by_utente($1);";
     $result = pg_prepare($db, 'get_fatture_by_utente', $sql);
     $result = pg_execute($db, 'get_fatture_by_utente', $params);
+    if ($result === false) {
+        close_pg_connection($db);
+        return [];
+    }
+    $fatture = [];
+    while ($row = pg_fetch_assoc($result)) {
+        $fatture[] = $row;
+    }
+    close_pg_connection($db);
+    return $fatture;
+}
+
+/**
+ * M
+ * Restituisce tutte le fatture.
+ */
+function get_all_fatture(): array
+{
+    $db = open_pg_connection();
+    $sql = "SELECT * FROM get_all_fatture();";
+    $result = pg_prepare($db, 'get_all_fatture', $sql);
+    $result = pg_execute($db, 'get_all_fatture', array());
     if ($result === false) {
         close_pg_connection($db);
         return [];

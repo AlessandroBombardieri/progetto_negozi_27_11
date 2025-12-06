@@ -7,7 +7,7 @@ if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
 $codice_fiscale = $_SESSION['utente']['codice_fiscale'];
-$rows = get_fatture_by_utente($codice_fiscale);
+$rows = get_all_fatture();
 ?>
 <!doctype html>
 <html lang="en">
@@ -24,7 +24,7 @@ $rows = get_fatture_by_utente($codice_fiscale);
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="h4 mb-0">Fatture</h1>
             <div>
-                <a class="btn btn-outline-secondary me-2" href="../home.php">← Home cliente</a>
+                <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
             </div>
         </div>
         <div class="card shadow-sm">
@@ -35,9 +35,11 @@ $rows = get_fatture_by_utente($codice_fiscale);
                         <thead class="table-light">
                             <tr>
                                 <th>Codice fattura</th>
+                                <th>Codice fiscale</th>
+                                <th>Codice negozio</th>
+                                <th>Codice prodotto</th>
                                 <th>Data acquisto</th>
                                 <th>Totale</th>
-                                <th>Sconto (%)</th>
                                 <th>Totale pagato</th>
                             </tr>
                         </thead>
@@ -45,17 +47,11 @@ $rows = get_fatture_by_utente($codice_fiscale);
                             <?php foreach ($rows as $r): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($r['codice_fattura']) ?></td>
+                                    <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
+                                    <td><?= htmlspecialchars($r['codice_negozio']) ?></td>
+                                    <td><?= htmlspecialchars($r['codice_prodotto']) ?></td>
                                     <td><?= htmlspecialchars($r['data_acquisto']) ?></td>
                                     <td><?= htmlspecialchars($r['totale']) ?></td>
-                                    <td>
-                                        <?php
-                                        if ($r['sconto_percentuale'] === null) {
-                                            echo 'N/A';
-                                        } else {
-                                            echo htmlspecialchars($r['sconto_percentuale']) . ' %';
-                                        }
-                                        ?>
-                                    </td>
                                     <td><?= htmlspecialchars($r['totale_pagato']) ?></td>
                                 </tr>
                             <?php endforeach;

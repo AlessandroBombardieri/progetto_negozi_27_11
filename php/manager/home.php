@@ -104,9 +104,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Storico ordini</h5>
+                        <h5 class="card-title">Ordini</h5>
                         <p class="card-text text-muted">Storico ordini effettuati presso fornitori.</p>
-                        <a class="btn btn-outline-primary mb-1" href="ordini/home.php">Visualizza storico ordini</a>
+                        <a class="btn btn-outline-primary mb-1" href="ordini/home.php">Visualizza</a>
                     </div>
                 </div>
             </div>
@@ -115,9 +115,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Storico fatture</h5>
-                        <p class="card-text text-muted">Storici per cliente/prodotto/negozio.</p>
-                        <a class="btn btn-outline-primary" href="fatture/index.php">Visualizza storico fatture</a>
+                        <h5 class="card-title">Fatture</h5>
+                        <p class="card-text text-muted">Storico fatture emesse.</p>
+                        <a class="btn btn-outline-primary" href="fatture/home.php">Visualizza</a>
                     </div>
                 </div>
             </div>
