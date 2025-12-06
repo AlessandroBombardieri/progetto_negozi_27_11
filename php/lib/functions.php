@@ -624,3 +624,33 @@ function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizza
     close_pg_connection($db);
     return $result;
 }
+
+
+/*
+ * ...
+ */
+function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio, array $items): ?string
+{
+    if (empty($items)) {
+        return null;
+    }
+    $db = open_pg_connection();
+    $prodotti = [];
+    $quantita = [];
+    foreach ($items as $codice_prodotto => $it) {
+        $prodotti[] = $codice_prodotto;
+        $quantita[] = (int)$it['qty'];
+    }
+    $prodotti_pg = '{' . implode(',', $prodotti) . '}';
+    $quantita_pg = '{' . implode(',', $quantita) . '}';
+    $params = [$codice_fiscale, $codice_negozio, $prodotti_pg, $quantita_pg];
+    $sql = "SELECT add_fattura_by_carrello($1, $2, $3::uuid[], $4::int8[]) AS codice_fattura;";
+    $result = pg_query_params($db, $sql, $params);
+    if (!$result) {
+        close_pg_connection($db);
+        return null;
+    }
+    $row = pg_fetch_assoc($result);
+    close_pg_connection($db);
+    return $row['codice_fattura'] ?? null;
+}

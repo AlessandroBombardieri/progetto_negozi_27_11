@@ -8,7 +8,7 @@ DECLARE
 BEGIN
     UPDATE tessera_fedelta
     SET saldo_punti = saldo_punti + FLOOR(NEW.totale_pagato)
-    WHERE codice_fiscale = NEW.codice_fiscale;
+    WHERE codice_fiscale = NEW.codice_fiscale AND dismessa = FALSE;
     RETURN NEW;
 END;
 $$ language 'plpgsql';

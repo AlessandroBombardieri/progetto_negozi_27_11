@@ -648,3 +648,54 @@ BEGIN
     ORDER BY u.cognome, u.nome;
 END;
 $$ LANGUAGE plpgsql;
+
+/* ... */
+CREATE OR REPLACE FUNCTION add_fattura_by_carrello(
+    _codice_fiscale varchar,
+    _codice_negozio uuid,
+    _prodotti uuid[],
+    _quantita int8[]
+) RETURNS uuid
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    i int;
+    _prezzo float8;
+    _totale float8 := 0;
+    _codice_fattura uuid;
+BEGIN
+    IF _prodotti IS NULL OR _quantita IS NULL THEN
+        RAISE EXCEPTION 'Lista prodotti o quantità nulla';
+    END IF;
+    IF array_length(_prodotti, 1) IS DISTINCT FROM array_length(_quantita, 1) THEN
+        RAISE EXCEPTION 'Array prodotti e quantità di lunghezza diversa';
+    END IF;
+    -- Calcolo del totale
+    FOR i IN 1..array_length(_prodotti, 1) LOOP
+        SELECT prezzo INTO _prezzo
+        FROM vende
+        WHERE codice_negozio = _codice_negozio
+          AND codice_prodotto = _prodotti[i];
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Prodotto % non venduto dal negozio %', _prodotti[i], _codice_negozio;
+        END IF;
+        _totale := _totale + _prezzo * _quantita[i];
+    END LOOP;
+    INSERT INTO fattura (data_acquisto, totale, sconto_percentuale, totale_pagato, codice_fiscale)
+    VALUES (CURRENT_DATE, _totale, NULL, _totale, _codice_fiscale)
+    RETURNING codice_fattura INTO _codice_fattura;
+    FOR i IN 1..array_length(_prodotti, 1) LOOP
+        SELECT prezzo INTO _prezzo
+        FROM vende
+        WHERE codice_negozio = _codice_negozio
+          AND codice_prodotto = _prodotti[i];
+        INSERT INTO emette (codice_negozio, codice_prodotto, codice_fattura, prezzo, quantita_acquistata)
+        VALUES (_codice_negozio, _prodotti[i], _codice_fattura, _prezzo, _quantita[i]);
+        UPDATE vende
+        SET quantita = quantita - _quantita[i]
+        WHERE codice_negozio = _codice_negozio
+          AND codice_prodotto = _prodotti[i];
+    END LOOP;
+    RETURN _codice_fattura;
+END;
+$$;
