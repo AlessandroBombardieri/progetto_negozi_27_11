@@ -32,9 +32,6 @@ if (isset($_POST)) {
                 case 'manager':
                     redirect('../manager/home.php');
                     break;
-                /*case 'utente':
-                    redirect('../utente/home.php');
-                    break;*/
                 default:
                     redirect('../cliente/home.php');
                     break;
