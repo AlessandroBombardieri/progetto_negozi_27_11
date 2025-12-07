@@ -36,9 +36,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Account</h5>
-                        <p class="card-text text-muted">Gestisci la tua password.</p>
-                        <a class="btn btn-outline-primary" href="password.php">Cambia password</a>
+                        <h5 class="card-title">Password</h5>
+                        <br>
+                        <a class="btn btn-outline-primary" href="password.php">Modifica password</a>
                     </div>
                 </div>
             </div>
@@ -48,8 +48,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Clienti</h5>
-                        <p class="card-text text-muted">Visualizza e crea utenze.</p>
-                        <a class="btn btn-outline-primary" href="clienti/home.php">Gestisci utenti</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="clienti/home.php">Visualizza e crea utenze clienti</a>
                     </div>
                 </div>
             </div>
@@ -59,8 +59,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Tessere</h5>
-                        <p class="card-text text-muted">Associa tessere a clienti/negozi.</p>
-                        <a class="btn btn-outline-primary" href="tessere/home.php">Gestisci tessere</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="tessere/home.php">Visualizza e crea tessere fedeltà</a>
                     </div>
                 </div>
             </div>
@@ -70,10 +70,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Negozi</h5>
-                        <p class="card-text text-muted">Inserisci, chiudi e gestisci i negozi della catena.</p>
-                        <div class="d-grid gap-2 d-md-block">
-                            <a class="btn btn-outline-primary me-1 mb-1" href="negozi/home.php">Gestisci negozi</a>
-                        </div>
+                        <br>
+                        <a class="btn btn-outline-primary" href="negozi/home.php">Visualizza, crea, dismetti e rifornisci negozi</a>
                     </div>
                 </div>
             </div>
@@ -83,8 +81,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Fornitori</h5>
-                        <p class="card-text text-muted">Elenco e cataloghi fornitori.</p>
-                        <a class="btn btn-outline-primary" href="fornitori/home.php">Gestisci fornitori</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="fornitori/home.php">Visualizza, crea e rifornisci fornitori</a>
                     </div>
                 </div>
             </div>
@@ -94,8 +92,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Prodotti</h5>
-                        <p class="card-text text-muted">Elenco globale dei prodotti.</p>
-                        <a class="btn btn-outline-primary" href="prodotti/home.php">Gestisci prodotti</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="prodotti/home.php">Visualizza e crea prodotti</a>
                     </div>
                 </div>
             </div>
@@ -105,8 +103,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Ordini</h5>
-                        <p class="card-text text-muted">Storico ordini effettuati presso fornitori.</p>
-                        <a class="btn btn-outline-primary mb-1" href="ordini/home.php">Visualizza</a>
+                        <br>
+                        <a class="btn btn-outline-primary mb-1" href="ordini/home.php">Visualizza storico ordini</a>
                     </div>
                 </div>
             </div>
@@ -116,14 +114,14 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Fatture</h5>
-                        <p class="card-text text-muted">Storico fatture emesse.</p>
-                        <a class="btn btn-outline-primary" href="fatture/home.php">Visualizza</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="fatture/home.php">Visualizza storico fatture</a>
                     </div>
                 </div>
             </div>
 
-        <div class="mt-4"><a href="../logout.php">Logout</a></div>
-    </div>
+            <div class="mt-4"><a href="../logout.php">Logout</a></div>
+        </div>
 </body>
 
 </html>
