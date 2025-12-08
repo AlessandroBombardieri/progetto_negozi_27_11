@@ -339,7 +339,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 /* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
 vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
 a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.

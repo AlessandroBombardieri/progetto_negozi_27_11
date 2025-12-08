@@ -1,3 +1,7 @@
+/* Procedure. */
+
+/* Password. */
+
 /* Permette di modificare la password relativa ad un utente con una nuova, a patto che la vecchia password fornita sia corretta. */
 CREATE OR REPLACE PROCEDURE change_password(
     _codice_fiscale VARCHAR,
@@ -23,6 +27,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Utenti/Clienti */
+
 /* Permette di creare un nuovo cliente. */
 CREATE OR REPLACE PROCEDURE add_cliente(
     _codice_fiscale VARCHAR,
@@ -41,6 +47,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Prodotti. */
+
 /* Permette di creare un nuovo prodotto. */
 CREATE OR REPLACE PROCEDURE add_prodotto(
     _nome VARCHAR,
@@ -49,17 +57,6 @@ CREATE OR REPLACE PROCEDURE add_prodotto(
 BEGIN
     INSERT INTO prodotto(nome, descrizione)
     VALUES (_nome, _descrizione);
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di creare un nuovo fornitore. */
-CREATE OR REPLACE PROCEDURE add_fornitore(
-    _partita_iva VARCHAR,
-    _indirizzo VARCHAR
-) AS $$
-BEGIN
-    INSERT INTO fornitore(partita_iva, indirizzo)
-    VALUES (_partita_iva, _indirizzo);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -105,18 +102,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di creare un nuovo negozio. */
-CREATE OR REPLACE PROCEDURE add_negozio(
-    _indirizzo VARCHAR,
-    _orario_apertura VARCHAR,
-    _responsabile VARCHAR
-) AS $$
-BEGIN
-    INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
-    VALUES (_indirizzo, _orario_apertura, _responsabile, FALSE);
-END;
-$$ LANGUAGE plpgsql;
-
 /* Permette di modificare il prezzo di vendita di un prodotto in vendita presso un negozio. */
 CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
     _codice_negozio UUID,
@@ -137,82 +122,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di creare una nuova tessera dato un cliente ed un negozio, se e solo se tale cliente non ne possiede già una attiva.
-Se il cliente è in possesso di una tessera dismessa, allora si recuperano i punti di tale tessera i quali vengono aggiunti come saldo iniziale. */
-CREATE OR REPLACE PROCEDURE add_tessera(
-    _codice_negozio UUID,
-    _codice_fiscale VARCHAR,
-    _data DATE
+/* Fornitori. */
+
+/* Permette di creare un nuovo fornitore. */
+CREATE OR REPLACE PROCEDURE add_fornitore(
+    _partita_iva VARCHAR,
+    _indirizzo VARCHAR
 ) AS $$
-DECLARE
-    _saldo_punti INT8;
 BEGIN
-    -- Se il codice fiscale dell'utente non trova alcuna corrispondenza allora segnala errore.
-    IF NOT EXISTS (
-        SELECT 1 FROM utente
-        WHERE codice_fiscale = _codice_fiscale
-    ) THEN
-        RAISE EXCEPTION 'Cliente % inesistente', _codice_fiscale;
-    END IF;
-    -- Se il codice negozio inserito non trova corrispondenza, allora segnala errore.
-    IF NOT EXISTS (
-        SELECT 1 FROM negozio
-        WHERE codice_negozio = _codice_negozio
-    ) THEN
-        RAISE EXCEPTION 'Negozio % inesistente', _codice_negozio;
-    END IF;
-    -- Se esiste già una tessera fedeltà attiva associata all'utente allora segnala errore.
-    IF EXISTS (
-        SELECT 1
-        FROM tessera_fedelta
-        WHERE codice_fiscale = _codice_fiscale
-          AND dismessa = FALSE
-    ) THEN
-        RAISE EXCEPTION 'Tessera attiva già presente per %', _codice_fiscale;
-    END IF;
-    -- Se esiste già una tessera dismessa associata all'utente allora ne recupera il saldo.
-    SELECT saldo_punti
-    INTO _saldo_punti
-    FROM tessera_fedelta
-    WHERE codice_fiscale = _codice_fiscale
-      AND dismessa = TRUE
-    ORDER BY data_richiesta DESC
-    LIMIT 1;
-    IF FOUND THEN
-        INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
-        VALUES (_codice_negozio, _codice_fiscale, _data, _saldo_punti, FALSE);
-        RETURN;
-    END IF;
-    -- Altrimenti crea una nuova tessera con saldo punti iniziale pari a 0.
-    INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
-    VALUES (_codice_negozio, _codice_fiscale, _data, 0, FALSE);
+    INSERT INTO fornitore(partita_iva, indirizzo)
+    VALUES (_partita_iva, _indirizzo);
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di aggiornare la data di consegna di un ordine. */
-CREATE OR REPLACE PROCEDURE update_data_consegna_ordine(
-    _numero_ordine UUID,
-    _data_consegna DATE
+/* Negozi. */
+
+/* Permette di creare un nuovo negozio. */
+CREATE OR REPLACE PROCEDURE add_negozio(
+    _indirizzo VARCHAR,
+    _orario_apertura VARCHAR,
+    _responsabile VARCHAR
 ) AS $$
-DECLARE
-    _data_ordine DATE;
 BEGIN
-    IF _data_consegna IS NULL THEN
-        RAISE EXCEPTION 'La data di consegna non può essere NULL';
-    END IF;
-    SELECT data_ordine INTO _data_ordine
-    FROM ordine
-    WHERE numero_ordine = _numero_ordine;
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'Ordine % inesistente', _numero_ordine;
-    END IF;
-    -- Se la nuova data di consegna dell'ordine è precedente rispetto alla data dell'ordinazione allora segnala errore.
-    IF _data_consegna < _data_ordine THEN
-        RAISE EXCEPTION 'La data di consegna (%) non può essere precedente alla data ordine (%)', _data_consegna, _data_ordine;
-    END IF;
-    UPDATE ordine
-    SET data_consegna = _data_consegna
-    WHERE numero_ordine = _numero_ordine;
+    INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
+    VALUES (_indirizzo, _orario_apertura, _responsabile, FALSE);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -256,6 +189,8 @@ BEGIN
     WHERE codice_negozio = _codice_negozio;
 END;
 $$ LANGUAGE plpgsql;
+
+/* Fatture. */
 
 /* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
 vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
@@ -318,5 +253,88 @@ BEGIN
         SET saldo_punti = saldo_punti - _punti_utilizzati
         WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
     END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Tessere fedeltà. */
+
+/* Permette di creare una nuova tessera dato un cliente ed un negozio, se e solo se tale cliente non ne possiede già una attiva.
+Se il cliente è in possesso di una tessera dismessa, allora si recuperano i punti di tale tessera i quali vengono aggiunti come saldo iniziale. */
+CREATE OR REPLACE PROCEDURE add_tessera(
+    _codice_negozio UUID,
+    _codice_fiscale VARCHAR,
+    _data DATE
+) AS $$
+DECLARE
+    _saldo_punti INT8;
+BEGIN
+    -- Se il codice fiscale dell'utente non trova alcuna corrispondenza allora segnala errore.
+    IF NOT EXISTS (
+        SELECT 1 FROM utente
+        WHERE codice_fiscale = _codice_fiscale
+    ) THEN
+        RAISE EXCEPTION 'Cliente % inesistente', _codice_fiscale;
+    END IF;
+    -- Se il codice negozio inserito non trova corrispondenza, allora segnala errore.
+    IF NOT EXISTS (
+        SELECT 1 FROM negozio
+        WHERE codice_negozio = _codice_negozio
+    ) THEN
+        RAISE EXCEPTION 'Negozio % inesistente', _codice_negozio;
+    END IF;
+    -- Se esiste già una tessera fedeltà attiva associata all'utente allora segnala errore.
+    IF EXISTS (
+        SELECT 1
+        FROM tessera_fedelta
+        WHERE codice_fiscale = _codice_fiscale
+          AND dismessa = FALSE
+    ) THEN
+        RAISE EXCEPTION 'Tessera attiva già presente per %', _codice_fiscale;
+    END IF;
+    -- Se esiste già una tessera dismessa associata all'utente allora ne recupera il saldo.
+    SELECT saldo_punti
+    INTO _saldo_punti
+    FROM tessera_fedelta
+    WHERE codice_fiscale = _codice_fiscale
+      AND dismessa = TRUE
+    ORDER BY data_richiesta DESC
+    LIMIT 1;
+    IF FOUND THEN
+        INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
+        VALUES (_codice_negozio, _codice_fiscale, _data, _saldo_punti, FALSE);
+        RETURN;
+    END IF;
+    -- Altrimenti crea una nuova tessera con saldo punti iniziale pari a 0.
+    INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
+    VALUES (_codice_negozio, _codice_fiscale, _data, 0, FALSE);
+END;
+$$ LANGUAGE plpgsql;
+
+/* Ordini. */
+
+/* Permette di aggiornare la data di consegna di un ordine. */
+CREATE OR REPLACE PROCEDURE update_data_consegna_ordine(
+    _numero_ordine UUID,
+    _data_consegna DATE
+) AS $$
+DECLARE
+    _data_ordine DATE;
+BEGIN
+    IF _data_consegna IS NULL THEN
+        RAISE EXCEPTION 'La data di consegna non può essere NULL';
+    END IF;
+    SELECT data_ordine INTO _data_ordine
+    FROM ordine
+    WHERE numero_ordine = _numero_ordine;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Ordine % inesistente', _numero_ordine;
+    END IF;
+    -- Se la nuova data di consegna dell'ordine è precedente rispetto alla data dell'ordinazione allora segnala errore.
+    IF _data_consegna < _data_ordine THEN
+        RAISE EXCEPTION 'La data di consegna (%) non può essere precedente alla data ordine (%)', _data_consegna, _data_ordine;
+    END IF;
+    UPDATE ordine
+    SET data_consegna = _data_consegna
+    WHERE numero_ordine = _numero_ordine;
 END;
 $$ LANGUAGE plpgsql;
