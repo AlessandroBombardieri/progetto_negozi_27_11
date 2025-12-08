@@ -1,3 +1,7 @@
+/* Funzioni. */
+
+/* Login. */
+
 /* Permette di verificare la validità delle credenziali di login fornite,
 restituendo il codice fiscale dell'utente ed il suo ruolo qualora risultino valide. */
 CREATE OR REPLACE FUNCTION check_login(
@@ -13,6 +17,39 @@ BEGIN
     SELECT codice_fiscale, ruolo
     FROM utente
     WHERE email = _email AND password = _password;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Utenti/Clienti */
+
+/* Permette di ottenere i dati relativi a tutti i clienti. */
+CREATE OR REPLACE FUNCTION get_all_clienti()
+RETURNS TABLE (
+    codice_fiscale VARCHAR,
+    email VARCHAR,
+    ruolo VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    provincia VARCHAR,
+    citta VARCHAR,
+    via VARCHAR,
+    civico VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.email,
+        u.ruolo,
+        u.nome,
+        u.cognome,
+        u.provincia,
+        u.citta,
+        u.via,
+        u.civico
+    FROM utente AS u
+    WHERE u.ruolo = 'cliente'
+    ORDER BY u.cognome, u.nome;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -48,36 +85,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi a tutti i clienti. */
-CREATE OR REPLACE FUNCTION get_all_clienti()
-RETURNS TABLE (
-    codice_fiscale VARCHAR,
-    email VARCHAR,
-    ruolo VARCHAR,
-    nome VARCHAR,
-    cognome VARCHAR,
-    provincia VARCHAR,
-    citta VARCHAR,
-    via VARCHAR,
-    civico VARCHAR
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        u.codice_fiscale,
-        u.email,
-        u.ruolo,
-        u.nome,
-        u.cognome,
-        u.provincia,
-        u.citta,
-        u.via,
-        u.civico
-    FROM utente AS u
-    WHERE u.ruolo = 'cliente'
-    ORDER BY u.cognome, u.nome;
-END;
-$$ LANGUAGE plpgsql;
+/* Prodotti. */
 
 /* Permette di ottenere i dati relativi a tutti i prodotti. */
 CREATE OR REPLACE FUNCTION get_all_prodotti()
@@ -97,16 +105,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi a tutti i fornitori. */
-CREATE OR REPLACE FUNCTION get_all_fornitori()
+/* Permette di ottenere i dati relativi ai prodotti in vendita presso un negozio. */
+CREATE OR REPLACE FUNCTION get_prodotti_by_negozio(_codice_negozio UUID)
 RETURNS TABLE (
-    partita_iva VARCHAR,
-    indirizzo VARCHAR
+    codice_prodotto UUID,
+    nome VARCHAR,
+    descrizione VARCHAR,
+    prezzo FLOAT8,
+    quantita INT8
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT f.partita_iva, f.indirizzo
-    FROM fornitore f;
+    SELECT
+        p.codice_prodotto,
+        p.nome,
+        p.descrizione,
+        v.prezzo,
+        v.quantita
+    FROM vende v
+    JOIN prodotto p ON p.codice_prodotto = v.codice_prodotto
+    WHERE v.codice_negozio = _codice_negozio;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -151,50 +169,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi a tutti i negozi. */
-CREATE OR REPLACE FUNCTION get_all_negozi()
-RETURNS TABLE (
-    codice_negozio UUID,
-	indirizzo VARCHAR,
-	orario_apertura VARCHAR,
-	nominativo_responsabile VARCHAR,
-	dismesso BOOL
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        n.codice_negozio,
-        n.indirizzo,
-        n.orario_apertura,
-        n.nominativo_responsabile,
-        n.dismesso
-    FROM negozio n;
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di ottenere i dati relativi ai prodotti in vendita presso un negozio. */
-CREATE OR REPLACE FUNCTION get_prodotti_by_negozio(_codice_negozio UUID)
-RETURNS TABLE (
-    codice_prodotto UUID,
-    nome VARCHAR,
-    descrizione VARCHAR,
-    prezzo FLOAT8,
-    quantita INT8
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        p.codice_prodotto,
-        p.nome,
-        p.descrizione,
-        v.prezzo,
-        v.quantita
-    FROM vende v
-    JOIN prodotto p ON p.codice_prodotto = v.codice_prodotto
-    WHERE v.codice_negozio = _codice_negozio;
-END;
-$$ LANGUAGE plpgsql;
-
 /* 3.2.5. Ordine prodotti da fornitore. Quando un prodotto deve essere rifornito di una certa quantità,
 è necessario inserire un ordine presso un determinato fornitore. Il fornitore deve essere automaticamente
 scelto sulla base del criterio di economicità (vale a dire, l’ordine viene automaticamente effettuato presso il fornitore che,
@@ -229,6 +203,44 @@ BEGIN
     -- Ritorna il codice dell'ordine appena creato.
     RETURNING numero_ordine INTO _ordine_id;
     RETURN _ordine_id;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Fornitori. */
+
+/* Permette di ottenere i dati relativi a tutti i fornitori. */
+CREATE OR REPLACE FUNCTION get_all_fornitori()
+RETURNS TABLE (
+    partita_iva VARCHAR,
+    indirizzo VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT f.partita_iva, f.indirizzo
+    FROM fornitore f;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Negozi. */
+
+/* Permette di ottenere i dati relativi a tutti i negozi. */
+CREATE OR REPLACE FUNCTION get_all_negozi()
+RETURNS TABLE (
+    codice_negozio UUID,
+	indirizzo VARCHAR,
+	orario_apertura VARCHAR,
+	nominativo_responsabile VARCHAR,
+	dismesso BOOL
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        n.codice_negozio,
+        n.indirizzo,
+        n.orario_apertura,
+        n.nominativo_responsabile,
+        n.dismesso
+    FROM negozio n;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -276,131 +288,57 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* 3.2.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
-CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
-RETURNS TABLE (
-    codice_fiscale varchar,
-    nome varchar,
-    cognome varchar,
-    email varchar,
-    saldo_punti bigint,
-    data_richiesta date
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        u.codice_fiscale,
-        u.nome,
-        u.cognome,
-        u.email,
-        t.saldo_punti,
-        t.data_richiesta
-    FROM tessera_fedelta AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
-    WHERE t.codice_negozio = _codice_negozio AND t.dismessa = FALSE
-    ORDER BY u.cognome, u.nome;
-END;
-$$ LANGUAGE plpgsql;
+/* Fatture. */
 
-/* Permette di ottenere i dati relativi alle tessere fedeltà emesse da un negozio dismesso. */
-CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio uuid)
+/* Permette di ottenere i dati relativi a tutte le fatture. */
+CREATE OR REPLACE FUNCTION get_all_fatture()
 RETURNS TABLE (
-    codice_fiscale varchar,
-    nome varchar,
-    cognome varchar,
-    email varchar,
-    saldo_punti bigint,
-    data_richiesta date
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        u.codice_fiscale,
-        u.nome,
-        u.cognome,
-        u.email,
-        t.saldo_punti,
-        t.data_richiesta
-    FROM view_tessere_dismesse AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
-    WHERE t.codice_negozio = _codice_negozio
-    ORDER BY u.cognome, u.nome;
-END;
-$$ LANGUAGE plpgsql;
-
-/* 3.2.7. Storico ordini a fornitori. Dato un fornitore, è necessario conoscere tutti gli ordini che sono stati effettuati presso di lui. */
-CREATE OR REPLACE FUNCTION get_storico_ordini_by_fornitore(_partita_iva VARCHAR)
-RETURNS TABLE (
-    numero_ordine UUID,
+    codice_fattura UUID,
+    codice_fiscale VARCHAR,
+    codice_negozio UUID,
     codice_prodotto UUID,
-    nome VARCHAR,
-    codice_negozio UUID,
-    indirizzo VARCHAR,
-    quantita_ordinata INT8,
-    data_ordine DATE,
-    data_consegna DATE,
-    totale FLOAT8
+    data_acquisto DATE,
+    totale FLOAT,
+    totale_pagato FLOAT8
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        o.numero_ordine,
-        o.codice_prodotto,
-        p.nome,
-        o.codice_negozio,
-        n.indirizzo,
-        o.quantita_ordinata,
-        o.data_ordine,
-        o.data_consegna,
-        o.totale
-    FROM ordine o
-    JOIN prodotto p ON p.codice_prodotto = o.codice_prodotto
-    JOIN negozio n ON n.codice_negozio = o.codice_negozio
-    WHERE o.partita_iva = _partita_iva
-    ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
+        e.codice_fattura,
+        f.codice_fiscale,
+        e.codice_negozio,
+        e.codice_prodotto,
+        f.data_acquisto,
+        f.totale,
+        f.totale_pagato
+    FROM emette e JOIN fattura f ON f.codice_fattura = e.codice_fattura
+    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi alle tessere fedeltà di un utente. */
-CREATE OR REPLACE FUNCTION get_tessere_by_utente(_codice_fiscale VARCHAR)
+/* Permette di ottenere i dati relativi alle fatture che coinvolgono un utente. */
+CREATE OR REPLACE FUNCTION get_fatture_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
-    codice_tessera UUID,
-    saldo_punti    INT8,
-    codice_negozio UUID,
-    data_richiesta  DATE,
-    dismessa       BOOLEAN
+    codice_fattura UUID,
+    data_acquisto DATE,
+    totale FLOAT8,
+    sconto_percentuale FLOAT8,
+    totale_pagato FLOAT8
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        t.codice_tessera,
-        t.saldo_punti,
-        t.codice_negozio,
-        t.data_richiesta,
-        t.dismessa
-    FROM tessera_fedelta AS t
-    WHERE t.codice_fiscale = _codice_fiscale
-    ORDER BY t.data_richiesta DESC;
+        f.codice_fattura,
+        f.data_acquisto,
+        f.totale,
+        f.sconto_percentuale,
+        f.totale_pagato
+    FROM fattura AS f
+    WHERE f.codice_fiscale = _codice_fiscale
+    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi alla tessere fedeltà non dismessa di un utente. */
-CREATE OR REPLACE FUNCTION get_tessera_non_dismessa_by_utente(_codice_fiscale VARCHAR)
-RETURNS TABLE (
-    codice_tessera UUID,
-    saldo_punti    INT8,
-    codice_negozio UUID,
-    data_richiesta  DATE
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        t.codice_tessera,
-        t.saldo_punti,
-        t.codice_negozio,
-        t.data_richiesta
-    FROM tessera_fedelta AS t
-    WHERE t.codice_fiscale = _codice_fiscale AND t.dismessa = FALSE;
-END;
-$$ LANGUAGE plpgsql;
 
 /* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
 vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
@@ -492,51 +430,132 @@ BEGIN
 END;
 $$;
 
-/* Permette di ottenere i dati relativi alle fatture che coinvolgono un utente. */
-CREATE OR REPLACE FUNCTION get_fatture_by_utente(_codice_fiscale VARCHAR)
+/* Tessere fedeltà. */
+
+/* Permette di ottenere i dati relativi alle tessere fedeltà di un utente. */
+CREATE OR REPLACE FUNCTION get_tessere_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
-    codice_fattura UUID,
-    data_acquisto DATE,
-    totale FLOAT8,
-    sconto_percentuale FLOAT8,
-    totale_pagato FLOAT8
+    codice_tessera UUID,
+    saldo_punti    INT8,
+    codice_negozio UUID,
+    data_richiesta  DATE,
+    dismessa       BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        f.codice_fattura,
-        f.data_acquisto,
-        f.totale,
-        f.sconto_percentuale,
-        f.totale_pagato
-    FROM fattura AS f
-    WHERE f.codice_fiscale = _codice_fiscale
-    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
+        t.codice_tessera,
+        t.saldo_punti,
+        t.codice_negozio,
+        t.data_richiesta,
+        t.dismessa
+    FROM tessera_fedelta AS t
+    WHERE t.codice_fiscale = _codice_fiscale
+    ORDER BY t.data_richiesta DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-/* Permette di ottenere i dati relativi a tutte le fatture. */
-CREATE OR REPLACE FUNCTION get_all_fatture()
+/* Permette di ottenere i dati relativi alla tessere fedeltà non dismessa di un utente. */
+CREATE OR REPLACE FUNCTION get_tessera_non_dismessa_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
-    codice_fattura UUID,
-    codice_fiscale VARCHAR,
+    codice_tessera UUID,
+    saldo_punti    INT8,
     codice_negozio UUID,
-    codice_prodotto UUID,
-    data_acquisto DATE,
-    totale FLOAT,
-    totale_pagato FLOAT8
+    data_richiesta  DATE
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        e.codice_fattura,
-        f.codice_fiscale,
-        e.codice_negozio,
-        e.codice_prodotto,
-        f.data_acquisto,
-        f.totale,
-        f.totale_pagato
-    FROM emette e JOIN fattura f ON f.codice_fattura = e.codice_fattura
-    ORDER BY f.data_acquisto DESC, f.codice_fattura DESC;
+        t.codice_tessera,
+        t.saldo_punti,
+        t.codice_negozio,
+        t.data_richiesta
+    FROM tessera_fedelta AS t
+    WHERE t.codice_fiscale = _codice_fiscale AND t.dismessa = FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
+/* 3.2.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
+RETURNS TABLE (
+    codice_fiscale varchar,
+    nome varchar,
+    cognome varchar,
+    email varchar,
+    saldo_punti bigint,
+    data_richiesta date
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.nome,
+        u.cognome,
+        u.email,
+        t.saldo_punti,
+        t.data_richiesta
+    FROM tessera_fedelta AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
+    WHERE t.codice_negozio = _codice_negozio AND t.dismessa = FALSE
+    ORDER BY u.cognome, u.nome;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di ottenere i dati relativi alle tessere fedeltà emesse da un negozio dismesso. */
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio uuid)
+RETURNS TABLE (
+    codice_fiscale varchar,
+    nome varchar,
+    cognome varchar,
+    email varchar,
+    saldo_punti bigint,
+    data_richiesta date
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.codice_fiscale,
+        u.nome,
+        u.cognome,
+        u.email,
+        t.saldo_punti,
+        t.data_richiesta
+    FROM view_tessere_dismesse AS t JOIN utente AS u ON u.codice_fiscale = t.codice_fiscale
+    WHERE t.codice_negozio = _codice_negozio
+    ORDER BY u.cognome, u.nome;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Ordini. */
+
+/* 3.2.7. Storico ordini a fornitori. Dato un fornitore, è necessario conoscere tutti gli ordini che sono stati effettuati presso di lui. */
+CREATE OR REPLACE FUNCTION get_storico_ordini_by_fornitore(_partita_iva VARCHAR)
+RETURNS TABLE (
+    numero_ordine UUID,
+    codice_prodotto UUID,
+    nome VARCHAR,
+    codice_negozio UUID,
+    indirizzo VARCHAR,
+    quantita_ordinata INT8,
+    data_ordine DATE,
+    data_consegna DATE,
+    totale FLOAT8
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.numero_ordine,
+        o.codice_prodotto,
+        p.nome,
+        o.codice_negozio,
+        n.indirizzo,
+        o.quantita_ordinata,
+        o.data_ordine,
+        o.data_consegna,
+        o.totale
+    FROM ordine o
+    JOIN prodotto p ON p.codice_prodotto = o.codice_prodotto
+    JOIN negozio n ON n.codice_negozio = o.codice_negozio
+    WHERE o.partita_iva = _partita_iva
+    ORDER BY o.data_ordine DESC, o.numero_ordine DESC;
 END;
 $$ LANGUAGE plpgsql;
