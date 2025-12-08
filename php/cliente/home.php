@@ -36,9 +36,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Account</h5>
-                        <p class="card-text text-muted">Gestisci la tua password.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/password.php">Cambia password</a>
+                        <h5 class="card-title">Password</h5>
+                        <br>
+                        <a class="btn btn-outline-primary" href="password.php">Modifica password</a>
                     </div>
                 </div>
             </div>
@@ -47,9 +47,9 @@ $u = $_SESSION['utente'];
             <div class="col-sm-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Tessera</h5>
-                        <p class="card-text text-muted">Vedi tessere attive e scadute, con saldo punti.</p>
-                        <a class="btn btn-outline-primary" href="tessere/home.php">Gestisci tessere</a>
+                        <h5 class="card-title">Tessere</h5>
+                        <br>
+                        <a class="btn btn-outline-primary" href="tessere/home.php">Visualizza tessere fedeltà</a>
                     </div>
                 </div>
             </div>
@@ -59,8 +59,8 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Fatture</h5>
-                        <p class="card-text text-muted">Storico dei tuoi acquisti.</p>
-                        <a class="btn btn-outline-primary" href="fatture/home.php">Vedi fatture</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="fatture/home.php">Visualizza storico fatture</a>
                     </div>
                 </div>
             </div>
@@ -70,8 +70,9 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Catalogo prodotti</h5>
-                        <p class="card-text text-muted">Sfoglia i prodotti e aggiungili al carrello.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/prodotti/home.php">Apri</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="prodotti/home.php">Visualizza ed aggiungi prodotti al
+                            carrello</a>
                     </div>
                 </div>
             </div>
@@ -81,8 +82,9 @@ $u = $_SESSION['utente'];
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title">Carrello</h5>
-                        <p class="card-text text-muted">Rivedi articoli o procedi all’ordine.</p>
-                        <a class="btn btn-outline-primary" href="/cliente/carrello/home.php">Apri</a>
+                        <br>
+                        <a class="btn btn-outline-primary" href="carrello/home.php">Visualizza carrello e procedi
+                            all'ordine</a>
                     </div>
                 </div>
             </div>

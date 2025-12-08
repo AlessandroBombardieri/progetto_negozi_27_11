@@ -1,3 +1,69 @@
+/* Procedure. */
+
+/* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
+vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
+a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.
+L’applicazione dello sconto avviene su scelta del cliente, e lo sconto viene applicato sul totale della fattura
+sulla quale viene applicato. In seguito all’applicazione dello sconto, il saldo punti della tessera fedeltà deve
+essere decurtato del numero di punti usato per lo sconto. */
+
+/* Applica lo sconto selezionato identificato tramite la quantità di punti utilizzati sul totale della relativa fattura. */
+CREATE OR REPLACE PROCEDURE update_totale_fattura(
+    _codice_fattura UUID,
+    _codice_fiscale VARCHAR,
+    _punti_utilizzati INT
+) AS $$
+DECLARE
+    _sconto_percentuale NUMERIC := 0;
+    _fattura_totale FLOAT8;
+    _sconto_euro FLOAT8 := 0;
+    _nuovo_totale FLOAT8;
+    _punti_disponibili INT;
+BEGIN
+    -- Salvo i punti correnti dell'utente all'interno dell'attributo _punti_disponibili.
+    SELECT saldo_punti
+    INTO _punti_disponibili
+    FROM tessera_fedelta
+    WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
+    -- Se i punti disponibili sono minori dei punti utilizzati allora segnala errore.
+    IF _punti_disponibili < _punti_utilizzati THEN
+        RAISE EXCEPTION 'Punti insufficienti: disponibili %, richiesti %', _punti_disponibili, _punti_utilizzati;
+    END IF;
+    -- Determina la percentuale di sconto in base ai punti utilizzati.
+    IF _punti_utilizzati = 100 THEN
+        _sconto_percentuale := 0.05;
+    ELSIF _punti_utilizzati = 200 THEN
+        _sconto_percentuale := 0.15;
+    ELSIF _punti_utilizzati = 300 THEN
+        _sconto_percentuale := 0.30;
+    ELSIF _punti_utilizzati = 0 THEN
+        _sconto_percentuale := 0.00;
+    ELSE
+        -- Se la quantità di punti utilizzati non è valida allora segnala errore.
+        RAISE EXCEPTION 'Numero di punti non valido';
+    END IF;
+    -- Salvo il totale della fattura all'interno dell'attributo _fattura_totale.
+    SELECT totale
+    INTO _fattura_totale
+    FROM fattura
+    WHERE codice_fattura = _codice_fattura;
+    -- Calcolo lo sconto applicabile alla fattura secondo la percentuale di sconto scelta, considerando un tetto massimo pari ad euro 100.
+    _sconto_euro := LEAST(_fattura_totale * _sconto_percentuale, 100);
+    -- Aggiorno il totale della fattura.
+    _nuovo_totale := _fattura_totale - _sconto_euro;
+    UPDATE fattura
+    SET sconto_percentuale = (_sconto_percentuale * 100)::float8,
+        totale_pagato = _nuovo_totale
+    WHERE codice_fattura = _codice_fattura;
+    -- Se sono stati utilizzati punti allora aggiorna il saldo relativo alla tessera fedeltà dell'utente.
+    IF _punti_utilizzati > 0 THEN
+        UPDATE tessera_fedelta
+        SET saldo_punti = saldo_punti - _punti_utilizzati
+        WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di modificare la password relativa ad un utente con una nuova, a patto che la vecchia password fornita sia corretta. */
 CREATE OR REPLACE PROCEDURE change_password(
     _codice_fiscale VARCHAR,
@@ -23,6 +89,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Permette di creare un nuovo utente. */
+CREATE OR REPLACE PROCEDURE add_utente(
+    _codice_fiscale VARCHAR,
+    _email VARCHAR,
+    _password VARCHAR,
+    _ruolo VARCHAR,
+    _nome VARCHAR,
+    _cognome VARCHAR,
+    _provincia VARCHAR,
+    _citta VARCHAR,
+    _via VARCHAR,
+    _civico VARCHAR
+) AS $$
+BEGIN
+    INSERT INTO utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico)
+    VALUES (_codice_fiscale, _email, _password, _ruolo, _nome, _cognome, _provincia, _citta, _via, _civico);
+END;
+$$ LANGUAGE plpgsql;
+
 /* Permette di creare un nuovo cliente. */
 CREATE OR REPLACE PROCEDURE add_cliente(
     _codice_fiscale VARCHAR,
@@ -38,6 +123,18 @@ CREATE OR REPLACE PROCEDURE add_cliente(
 BEGIN
     INSERT INTO utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico)
     VALUES (_codice_fiscale, _email, _password, 'cliente', _nome, _cognome, _provincia, _citta, _via, _civico);
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di creare un nuovo negozio. */
+CREATE OR REPLACE PROCEDURE add_negozio(
+    _indirizzo VARCHAR,
+    _orario_apertura VARCHAR,
+    _responsabile VARCHAR
+) AS $$
+BEGIN
+    INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
+    VALUES (_indirizzo, _orario_apertura, _responsabile, FALSE);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -60,80 +157,6 @@ CREATE OR REPLACE PROCEDURE add_fornitore(
 BEGIN
     INSERT INTO fornitore(partita_iva, indirizzo)
     VALUES (_partita_iva, _indirizzo);
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di aggiungere un nuovo prodotto all'inventario di un fornitore. */
-CREATE OR REPLACE PROCEDURE add_prodotto_as_fornitore(
-    _partita_iva VARCHAR,
-    _codice_prodotto UUID,
-    _prezzo FLOAT8,
-    _quantita INT
-) AS $$
-BEGIN
-    INSERT INTO venduto_da(partita_iva, codice_prodotto, prezzo, quantita)
-    VALUES (_partita_iva, _codice_prodotto, _prezzo, _quantita);
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di aggiungere alle scorte una determinata quantità di un prodotto presente nell'inventario di un fornitore. */
-CREATE OR REPLACE PROCEDURE update_quantita_prodotto_as_fornitore(
-    _partita_iva VARCHAR,
-    _codice_prodotto UUID,
-    _quantita INT
-) AS $$
-BEGIN
-    IF _quantita < 0 THEN
-        RAISE EXCEPTION 'La quantità da aggiungere non può essere negativa';
-    END IF;
-    UPDATE venduto_da
-    SET quantita = quantita + _quantita
-    WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di modificare il prezzo di vendita di un prodotto presente nell'inventario di un fornitore. */
-CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
-    _partita_iva VARCHAR,
-    _codice_prodotto UUID,
-    _prezzo FLOAT8
-) AS $$
-BEGIN
-    UPDATE venduto_da
-    SET prezzo = _prezzo
-    WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di creare un nuovo negozio. */
-CREATE OR REPLACE PROCEDURE add_negozio(
-    _indirizzo VARCHAR,
-    _orario_apertura VARCHAR,
-    _responsabile VARCHAR
-) AS $$
-BEGIN
-    INSERT INTO negozio(indirizzo, orario_apertura, nominativo_responsabile, dismesso)
-    VALUES (_indirizzo, _orario_apertura, _responsabile, FALSE);
-END;
-$$ LANGUAGE plpgsql;
-
-/* Permette di modificare il prezzo di vendita di un prodotto in vendita presso un negozio. */
-CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
-    _codice_negozio UUID,
-    _codice_prodotto UUID,
-    _nuovo_prezzo FLOAT8
-) AS $$
-BEGIN
-    IF _nuovo_prezzo < 0 THEN
-        RAISE EXCEPTION 'Prezzo negativo non ammesso';
-    END IF;
-    UPDATE vende
-    SET prezzo = _nuovo_prezzo
-    WHERE codice_negozio = _codice_negozio
-      AND codice_prodotto = _codice_prodotto;
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'Prodotto % non presente nel negozio %', _codice_prodotto, _codice_negozio;
-    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -186,6 +209,68 @@ BEGIN
     -- Altrimenti crea una nuova tessera con saldo punti iniziale pari a 0.
     INSERT INTO tessera_fedelta(codice_negozio, codice_fiscale, data_richiesta, saldo_punti, dismessa)
     VALUES (_codice_negozio, _codice_fiscale, _data, 0, FALSE);
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di aggiungere un nuovo prodotto all'inventario di un fornitore. */
+CREATE OR REPLACE PROCEDURE add_prodotto_as_fornitore(
+    _partita_iva VARCHAR,
+    _codice_prodotto UUID,
+    _prezzo FLOAT8,
+    _quantita INT
+) AS $$
+BEGIN
+    INSERT INTO venduto_da(partita_iva, codice_prodotto, prezzo, quantita)
+    VALUES (_partita_iva, _codice_prodotto, _prezzo, _quantita);
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di modificare il prezzo di vendita di un prodotto in vendita presso un negozio. */
+CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
+    _codice_negozio UUID,
+    _codice_prodotto UUID,
+    _nuovo_prezzo FLOAT8
+) AS $$
+BEGIN
+    IF _nuovo_prezzo < 0 THEN
+        RAISE EXCEPTION 'Prezzo negativo non ammesso';
+    END IF;
+    UPDATE vende
+    SET prezzo = _nuovo_prezzo
+    WHERE codice_negozio = _codice_negozio
+      AND codice_prodotto = _codice_prodotto;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Prodotto % non presente nel negozio %', _codice_prodotto, _codice_negozio;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di modificare il prezzo di vendita di un prodotto presente nell'inventario di un fornitore. */
+CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
+    _partita_iva VARCHAR,
+    _codice_prodotto UUID,
+    _prezzo FLOAT8
+) AS $$
+BEGIN
+    UPDATE venduto_da
+    SET prezzo = _prezzo
+    WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Permette di aggiungere alle scorte una determinata quantità di un prodotto presente nell'inventario di un fornitore. */
+CREATE OR REPLACE PROCEDURE update_quantita_prodotto_as_fornitore(
+    _partita_iva VARCHAR,
+    _codice_prodotto UUID,
+    _quantita INT
+) AS $$
+BEGIN
+    IF _quantita < 0 THEN
+        RAISE EXCEPTION 'La quantità da aggiungere non può essere negativa';
+    END IF;
+    UPDATE venduto_da
+    SET quantita = quantita + _quantita
+    WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -254,69 +339,5 @@ BEGIN
     -- Elimina ogni tupla di prodotto in vendita presso il negozio dismesso.
     DELETE FROM vende
     WHERE codice_negozio = _codice_negozio;
-END;
-$$ LANGUAGE plpgsql;
-
-/* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
-vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
-a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.
-L’applicazione dello sconto avviene su scelta del cliente, e lo sconto viene applicato sul totale della fattura
-sulla quale viene applicato. In seguito all’applicazione dello sconto, il saldo punti della tessera fedeltà deve
-essere decurtato del numero di punti usato per lo sconto. */
-
-/* Applica lo sconto selezionato identificato tramite la quantità di punti utilizzati sul totale della relativa fattura. */
-CREATE OR REPLACE PROCEDURE update_totale_fattura(
-    _codice_fattura UUID,
-    _codice_fiscale VARCHAR,
-    _punti_utilizzati INT
-) AS $$
-DECLARE
-    _sconto_percentuale NUMERIC := 0;
-    _fattura_totale FLOAT8;
-    _sconto_euro FLOAT8 := 0;
-    _nuovo_totale FLOAT8;
-    _punti_disponibili INT;
-BEGIN
-    -- Salvo i punti correnti dell'utente all'interno dell'attributo _punti_disponibili.
-    SELECT saldo_punti
-    INTO _punti_disponibili
-    FROM tessera_fedelta
-    WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
-    -- Se i punti disponibili sono minori dei punti utilizzati allora segnala errore.
-    IF _punti_disponibili < _punti_utilizzati THEN
-        RAISE EXCEPTION 'Punti insufficienti: disponibili %, richiesti %', _punti_disponibili, _punti_utilizzati;
-    END IF;
-    -- Determina la percentuale di sconto in base ai punti utilizzati.
-    IF _punti_utilizzati = 100 THEN
-        _sconto_percentuale := 0.05;
-    ELSIF _punti_utilizzati = 200 THEN
-        _sconto_percentuale := 0.15;
-    ELSIF _punti_utilizzati = 300 THEN
-        _sconto_percentuale := 0.30;
-    ELSIF _punti_utilizzati = 0 THEN
-        _sconto_percentuale := 0.00;
-    ELSE
-        -- Se la quantità di punti utilizzati non è valida allora segnala errore.
-        RAISE EXCEPTION 'Numero di punti non valido';
-    END IF;
-    -- Salvo il totale della fattura all'interno dell'attributo _fattura_totale.
-    SELECT totale
-    INTO _fattura_totale
-    FROM fattura
-    WHERE codice_fattura = _codice_fattura;
-    -- Calcolo lo sconto applicabile alla fattura secondo la percentuale di sconto scelta, considerando un tetto massimo pari ad euro 100.
-    _sconto_euro := LEAST(_fattura_totale * _sconto_percentuale, 100);
-    -- Aggiorno il totale della fattura.
-    _nuovo_totale := _fattura_totale - _sconto_euro;
-    UPDATE fattura
-    SET sconto_percentuale = (_sconto_percentuale * 100)::float8,
-        totale_pagato = _nuovo_totale
-    WHERE codice_fattura = _codice_fattura;
-    -- Se sono stati utilizzati punti allora aggiorna il saldo relativo alla tessera fedeltà dell'utente.
-    IF _punti_utilizzati > 0 THEN
-        UPDATE tessera_fedelta
-        SET saldo_punti = saldo_punti - _punti_utilizzati
-        WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
-    END IF;
 END;
 $$ LANGUAGE plpgsql;
