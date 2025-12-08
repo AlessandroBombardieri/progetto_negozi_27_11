@@ -1,22 +1,6 @@
 /* Triggers. */
 
-/* 3.2.1. Aggiornamento saldo punti su tessera fedeltà. Per ogni Euro speso, viene accumulato un punto
-sulla tessera del cliente che effettua la spesa. Il saldo punti su ogni tessera deve essere continuamente aggiornato. */
-CREATE OR REPLACE FUNCTION update_saldo_tessera()
-RETURNS TRIGGER AS $$
-DECLARE
-BEGIN
-    UPDATE tessera_fedelta
-    SET saldo_punti = saldo_punti + FLOOR(NEW.totale_pagato)
-    WHERE codice_fiscale = NEW.codice_fiscale AND dismessa = FALSE;
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
-CREATE TRIGGER i_update_saldo_tessera
-AFTER INSERT ON fattura
-FOR EACH ROW
-EXECUTE FUNCTION update_saldo_tessera();
+/* Prodotti. */
 
 /* 3.2.4. Aggiornamento disponibilità prodotti dai fornitori. La disponibilità dei prodotti dai vari fornitori
 è ovviamente limitata (e comunicata da ciascun fornitore alla catena di negozi).
@@ -62,6 +46,8 @@ AFTER INSERT ON ordine
 FOR EACH ROW
 EXECUTE FUNCTION update_disponibilita_as_fornitore();
 
+/* Tessere fedeltà. */
+
 /* Permette di impedire la creazione di una nuova tessera fedeltà se un utente ne possiede già una attiva. */
 CREATE OR REPLACE FUNCTION tessera_gia_presente()
 RETURNS TRIGGER AS $$
@@ -83,21 +69,23 @@ BEFORE INSERT ON tessera_fedelta
 FOR EACH ROW
 EXECUTE FUNCTION tessera_gia_presente();
 
-/* Permette di impedire la creazione di un ordine se la data di consegna dovesse già venir selezionata. */
-CREATE OR REPLACE FUNCTION data_consegna_ordine_is_not_empty()
+/* 3.2.1. Aggiornamento saldo punti su tessera fedeltà. Per ogni Euro speso, viene accumulato un punto
+sulla tessera del cliente che effettua la spesa. Il saldo punti su ogni tessera deve essere continuamente aggiornato. */
+CREATE OR REPLACE FUNCTION update_saldo_tessera()
 RETURNS TRIGGER AS $$
+DECLARE
 BEGIN
-    IF NEW.data_consegna IS NOT NULL THEN
-        RAISE EXCEPTION 'La data di consegna non può essere impostata al momento dell''ordine';
-    END IF;
+    UPDATE tessera_fedelta
+    SET saldo_punti = saldo_punti + FLOOR(NEW.totale_pagato)
+    WHERE codice_fiscale = NEW.codice_fiscale AND dismessa = FALSE;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ language 'plpgsql';
 
-CREATE TRIGGER i_data_consegna_ordine_is_not_empty
-BEFORE INSERT ON ordine
+CREATE TRIGGER i_update_saldo_tessera
+AFTER INSERT ON fattura
 FOR EACH ROW
-EXECUTE FUNCTION data_consegna_ordine_is_not_empty();
+EXECUTE FUNCTION update_saldo_tessera();
 
 /* Si occupa di aggiornare la vista materializzata relativa alle tessere fedeltà dismesse attivandosi non appena un negozio venga dismesso. */
 CREATE OR REPLACE FUNCTION refresh_view_tessere_dismesse()
@@ -115,3 +103,21 @@ CREATE TRIGGER u_refresh_view_tessere_dismesse
 AFTER UPDATE OF dismesso ON negozio
 FOR EACH ROW
 EXECUTE FUNCTION refresh_view_tessere_dismesse();
+
+/* Ordini. */
+
+/* Permette di impedire la creazione di un ordine se la data di consegna dovesse già venir selezionata. */
+CREATE OR REPLACE FUNCTION data_consegna_ordine_is_not_empty()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.data_consegna IS NOT NULL THEN
+        RAISE EXCEPTION 'La data di consegna non può essere impostata al momento dell''ordine';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER i_data_consegna_ordine_is_not_empty
+BEFORE INSERT ON ordine
+FOR EACH ROW
+EXECUTE FUNCTION data_consegna_ordine_is_not_empty();
