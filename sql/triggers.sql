@@ -89,7 +89,7 @@ EXECUTE FUNCTION update_saldo_tessera();
 
 /* Si occupa di aggiornare la vista materializzata relativa alle tessere fedeltà dismesse attivandosi non appena un negozio venga dismesso. */
 CREATE OR REPLACE FUNCTION refresh_view_tessere_dismesse()
-RETURNS trigger AS $$
+RETURNS TRIGGER AS $$
 BEGIN
     -- Se il negozio è appena stato dismesso, aggiorna la MV
     IF NEW.dismesso = TRUE AND OLD.dismesso = FALSE THEN
