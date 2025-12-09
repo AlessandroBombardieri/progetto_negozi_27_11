@@ -46,12 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1 class="h4 mb-0">Nuovo fornitore</h1>
             <a class="btn btn-outline-secondary" href="home.php">← Torna a Fornitori</a>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
                 <label class="form-label">Partita IVA</label>
@@ -62,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input name="indirizzo" class="form-control" required>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success">Crea</button>
+                <button class="btn btn-primary">Crea</button>
             </div>
         </form>
     </div>

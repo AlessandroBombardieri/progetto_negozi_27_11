@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 
 <head>
     <meta charset="utf-8">
-    <title>Storico ordini</title>
+    <title>Ordini</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Storico ordini</h1>
+            <h1 class="h4 mb-0">Ordini</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
             </div>

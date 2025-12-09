@@ -62,12 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1 class="h4 mb-0">Nuovo cliente</h1>
             <a class="btn btn-outline-secondary" href="home.php">← Torna a Clienti</a>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4"><label class="form-label">Codice Fiscale</label><input name="codice_fiscale"
                     class="form-control" maxlength="16" required></div><br>
@@ -83,12 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     class="form-control" required></div><br>
             <div class="col-md-4"><label class="form-label">Città</label><input name="citta" class="form-control"
                     required></div><br>
-            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control"
-                    required></div><br>
+            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control" required>
+            </div><br>
             <div class="col-md-1"><label class="form-label">Civico</label><input name="civico" class="form-control"
                     maxlength="3" required></div><br>
             <div class="col-12">
-                <button class="btn btn-success">Crea</button></div>
+                <button class="btn btn-primary">Crea</button>
+            </div>
         </form>
     </div>
 </body>

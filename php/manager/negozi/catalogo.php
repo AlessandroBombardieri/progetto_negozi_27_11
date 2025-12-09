@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['codice_negozio'])) {
                 <a class="btn btn-outline-secondary me-2" href="home.php">← Negozi</a>
                 <form method="post" action="ordine.php" class="d-inline">
                     <input type="hidden" name="codice_negozio" value="<?= htmlspecialchars($codice_negozio) ?>">
-                    <button class="btn btn-success">Nuovo ordine</button>
+                    <button class="btn btn-primary">Nuovo ordine</button>
                 </form>
             </div>
         </div>

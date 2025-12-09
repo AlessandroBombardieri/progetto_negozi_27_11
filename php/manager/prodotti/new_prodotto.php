@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <textarea name="descrizione" class="form-control" rows="4" maxlength="500"></textarea>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-success">Crea</button>
+                <button class="btn btn-primary">Crea</button>
             </div>
         </form>
     </div>

@@ -25,10 +25,9 @@ $rows = get_all_fornitori();
             <h1 class="h4 mb-0">Fornitori</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="new_fornitore.php">Nuovo fornitore</a>
+                <a class="btn btn-primary" href="new_fornitore.php">Nuovo fornitore</a>
             </div>
         </div>
-
         <div class="table-responsive bg-white shadow-sm rounded">
             <table class="table table-hover mb-0">
                 <thead class="table-light">

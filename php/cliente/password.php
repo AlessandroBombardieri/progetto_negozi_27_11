@@ -7,7 +7,7 @@ if (!isset($_SESSION['utente'])) {
     redirect('../home.php');
 }
 $u = $_SESSION['utente'];
-$msg = $err = null;
+$ok = $err = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $old_pw = $_POST['old_pw'];
     $new_pw = $_POST['new_pw'];
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$err) {
         $cf = $u['codice_fiscale'];
         if (change_password($cf, $old_pw, $new_pw)) {
-            $msg = "Password aggiornata con successo";
+            $ok = "Password aggiornata con successo";
         } else {
             $err = "Password inserita non corretta";
         }
@@ -38,39 +38,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Cambia password</title>
+    <title>Modifica password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Cambia password</h1>
+            <h1 class="h4 mb-0">Modifica password</h1>
             <a class="btn btn-outline-secondary" href="home.php">← Home cliente</a>
         </div>
-        <?php if ($msg): ?>
-            <div class="alert alert-success"><?= $msg ?></div><?php endif; ?>
+        <?php if ($ok): ?>
+            <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
-            <div class="mb-3">
+            <div class="mb-3 col-md-4">
                 <label class="form-label">Password attuale</label>
                 <input type="password" name="old_pw" class="form-control" maxlength="20" required
                     autocomplete="current-password">
             </div>
-            <div class="mb-3">
+            <div class="mb-3 col-md-4">
                 <label class="form-label">Nuova password</label>
                 <input type="password" name="new_pw" class="form-control" maxlength="20" required
                     autocomplete="new-password">
-                <div class="form-text">Max 20 caratteri.</div>
+                <div class="form-text">Massimo 20 caratteri</div>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 col-md-4">
                 <label class="form-label">Ripeti nuova password</label>
                 <input type="password" name="rep_pw" class="form-control" maxlength="20" required
                     autocomplete="new-password">
             </div>
-            <button class="btn btn-primary">Aggiorna</button>
+            <div class="col-12">
+                <button class="btn btn-primary">Aggiorna</button>
         </form>
     </div>
 </body>

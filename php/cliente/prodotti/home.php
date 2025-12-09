@@ -113,7 +113,7 @@ if (isset($_SESSION['carrello'])) {
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h2 class="h5 mb-3">Prodotti per negozio</h2>
-                <h1 class="h6 mb-3 text-muted">Attenzione: sono accettati esclusivamente ordini presso negozi singoli.</h1>
+                <h1 class="h6 mb-3 text-muted">Attenzione: sono accettati esclusivamente ordini presso negozi singoli</h1>
                 <form method="post" class="row g-2 mb-3">
                     <div class="col-md-8">
                         <select name="codice_negozio" class="form-select" required>
@@ -179,10 +179,10 @@ if (isset($_SESSION['carrello'])) {
                         </table>
                         <?php if ($rows): ?>
                             <div class="mt-3 text-end">
-                                <button class="btn btn-success" type="submit" name="submit_add_" value="1">
+                                <button class="btn btn-primary" type="submit" name="submit_add_" value="1">
                                     Aggiorna carrello
                                 </button>
-                            </div>
+                            <br>
                         <?php endif; ?>
                     </form>
                 </div>

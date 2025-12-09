@@ -25,10 +25,9 @@ $rows = get_all_negozi();
             <h1 class="h4 mb-0">Negozi</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="../home.php">← Home manager</a>
-                <a class="btn btn-success" href="new_negozio.php">Nuovo negozio</a>
+                <a class="btn btn-primary" href="new_negozio.php">Nuovo negozio</a>
             </div>
         </div>
-
         <div class="table-responsive bg-white shadow-sm rounded">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
@@ -54,7 +53,7 @@ $rows = get_all_negozi();
                                     <form method="post" action="dismetti.php" class="d-inline">
                                         <input type="hidden" name="codice_negozio"
                                             value="<?= htmlspecialchars($r['codice_negozio']) ?>">
-                                        <button class="btn btn-sm btn-danger">Dismetti</button>
+                                        <button class="btn btn-sm btn-outline-danger">Dismetti</button>
                                     </form>
                                 <?php endif; ?>
                                 <form method="post" action="catalogo.php" class="d-inline">

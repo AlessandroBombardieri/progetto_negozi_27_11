@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
 
         <form method="post" class="card p-3 shadow-sm">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <select name="codice_negozio_non_dismesso" class="form-select" required>
                     <option value="" disabled selected>Seleziona un negozio</option>
                     <?php foreach ($negozi_non_dismessi as $p): ?>
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                     <?php endforeach; ?>
                 </select>
             </div><br>
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <select name="codice_fiscale" class="form-select" required>
                     <option value="" disabled selected>Seleziona un cliente</option>
                     <?php foreach ($clienti as $p): ?>
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                 </select>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success" name="submit_add">Crea</button>
+                <button class="btn btn-primary" name="submit_add">Crea</button>
             </div>
         </form>
     </div>

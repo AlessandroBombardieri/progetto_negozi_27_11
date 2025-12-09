@@ -53,15 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                 </button>
             </form>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <select name="codice_prodotto" class="form-select" required>
                     <option value="" disabled selected>Seleziona un prodotto</option>
                     <?php foreach ($prodotti_disponibili as $p): ?>
@@ -71,16 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                     <?php endforeach; ?>
                 </select>
             </div><br>
-            <div class="col-md-2">
-                <label class="form-label">Prezzo di vendita (€)</label>
+            <div class="col-md-1">
+                <label class="form-label">Prezzo (€)</label>
                 <input type="number" step="0.01" min="0" name="prezzo" class="form-control" required>
             </div><br>
-            <div class="col-md-2">
-                <label class="form-label">Quantità disponibile</label>
+            <div class="col-md-1">
+                <label class="form-label">Quantità</label>
                 <input type="number" step="1" min="0" name="quantita" class="form-control" required>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success" name="submit_add" value="1">Aggiungi</button>
+                <button class="btn btn-primary" name="submit_add" value="1">Aggiungi</button>
             </div>
         </form>
     </div>

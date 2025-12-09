@@ -48,12 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1 class="h4 mb-0">Nuovo negozio</h1>
             <a class="btn btn-outline-secondary" href="home.php">← Torna a Negozi</a>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
                 <label class="form-label">Indirizzo</label>
@@ -61,14 +59,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div><br>
             <div class="col-md-4-3">
                 <label class="form-label">Orario di apertura</label>
-                <textarea name="orario_apertura" class="form-control" rows="3" maxlength="300"></textarea>
+                <textarea name="orario_apertura" class="form-control" rows="4" maxlength="300"></textarea>
             </div><br>
             <div class="col-md-4">
                 <label class="form-label">Nominativo responsabile</label>
                 <input name="nominativo_responsabile" class="form-control" required>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success">Crea</button>
+                <button class="btn btn-primary">Crea</button>
             </div>
         </form>
     </div>

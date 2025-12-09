@@ -29,7 +29,7 @@ $rows = get_all_fatture();
         </div>
         <div class="card shadow-sm">
             <div class="card-body">
-                <h2 class="h5 mb-3">Elenco fatture</h2>
+                <h2 class="h5 mb-3">Storico fatture</h2>
                 <div class="table-responsive bg-white shadow-sm rounded">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">

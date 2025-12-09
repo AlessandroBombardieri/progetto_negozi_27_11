@@ -42,21 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
             <h1 class="h4 mb-0">Inserisci data consegna</h1>
             <a class="btn btn-outline-secondary me-2" href="home.php">← Torna a storico ordini</a>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="numero_ordine" value="<?= htmlspecialchars($numero_ordine) ?>">
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label class="form-label">Data consegna</label>
                 <input type="date" name="data_consegna" class="form-control"
                     value="<?= htmlspecialchars($_POST['data_consegna'] ?? date('Y-m-d')) ?>" required>
             </div><br>
             <div class="d-flex gap-2">
-                <button class="btn btn-success" name="submit_add" value="1">Inserisci</button>
+                <button class="btn btn-primary" name="submit_add" value="1">Inserisci</button>
             </div>
         </form>
     </div>

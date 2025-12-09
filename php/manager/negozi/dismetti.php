@@ -45,16 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                 <a class="btn btn-outline-secondary" href="home.php">← Torna a Negozi</a>
             </div>
         </div>
-
         <?php if ($ok): ?>
             <div class="alert alert-success"><?= $ok ?></div><?php endif; ?>
         <?php if ($err): ?>
             <div class="alert alert-danger"><?= $err ?></div><?php endif; ?>
-
         <form method="post" class="card p-3 shadow-sm">
             <input type="hidden" name="codice_negozio" value="<?= htmlspecialchars($codice_negozio) ?>">
-
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <label class="form-label">Trasferisci prodotti</label>
                 <select name="nuovo_codice_negozio" class="form-select">
                     <option value="" selected>Seleziona un negozio (opzionale)</option>
@@ -67,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
                     <?php endforeach; ?>
                 </select>
                 <div class="form-text">Se non selezioni alcun negozio, i prodotti in vendita verranno definitivamente
-                    rimossi dal negozio dismesso.</div>
+                    rimossi</div>
             </div><br>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-sm btn-danger" name="submit_add" value="1">

@@ -242,7 +242,7 @@ if (!$carrello_vuoto && $codice_fiscale) {
                         <div>
                             Totale attuale: <strong><?= number_format($totale_carrello, 2, ',', '.') ?> €</strong>
                         </div>
-                        <button type="submit" name="acquista" value="1" class="btn btn-success">
+                        <button type="submit" name="acquista" value="1" class="btn btn-primary">
                             Procedi all'acquisto
                         </button>
                     </div>
