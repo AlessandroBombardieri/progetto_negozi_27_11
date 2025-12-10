@@ -2,7 +2,7 @@
 
 /* Prodotti. */
 
-/* 3.2.4. Aggiornamento disponibilità prodotti dai fornitori. La disponibilità dei prodotti dai vari fornitori
+/* 3.3.4. Aggiornamento disponibilità prodotti dai fornitori. La disponibilità dei prodotti dai vari fornitori
 è ovviamente limitata (e comunicata da ciascun fornitore alla catena di negozi).
 In seguito ad un ordine di un certo prodotto presso un certo fornitore, è necessario mantenere aggiornata
 la disponibilità di quel prodotto da quel fornitore. */
@@ -19,7 +19,7 @@ BEGIN
       AND codice_prodotto = NEW.codice_prodotto;
     -- Se partita iva fornitore oppure codice prodotto non trovati allora segnala errore.
     IF NOT FOUND OR _prezzo_fornitore IS NULL THEN
-        RAISE EXCEPTION 'Prezzo non disponibile per fornitore % e prodotto %', NEW.partita_iva, NEW.codice_prodotto;
+        RAISE EXCEPTION 'Fornitore o prodotto mancanti';
     END IF;
     -- Aggiorno la quantità di prodotto ordinato in vendita dal fornitore sottraendo la quantità ordinata.
     UPDATE venduto_da
@@ -27,10 +27,9 @@ BEGIN
     WHERE partita_iva = NEW.partita_iva
       AND codice_prodotto = NEW.codice_prodotto
       AND quantita >= NEW.quantita_ordinata;
-    -- Se partita iva fornitore oppure codice prodotto non trovati allora segnala errore.
+    -- Se la quantità disponibile è inferiore rispetto a quella ordinata allora segnala errore.
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'Scorte insufficienti per fornitore % e prodotto % (richieste %, disponibili inferiori)',
-                        NEW.partita_iva, NEW.codice_prodotto, NEW.quantita_ordinata;
+        RAISE EXCEPTION 'Scorte insufficienti';
     END IF;
     -- Aggiorno la tabella vende per il negozio che ha effettuato l'ordine.
     INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
@@ -69,7 +68,7 @@ BEFORE INSERT ON tessera_fedelta
 FOR EACH ROW
 EXECUTE FUNCTION tessera_gia_presente();
 
-/* 3.2.1. Aggiornamento saldo punti su tessera fedeltà. Per ogni Euro speso, viene accumulato un punto
+/* 3.3.1. Aggiornamento saldo punti su tessera fedeltà. Per ogni Euro speso, viene accumulato un punto
 sulla tessera del cliente che effettua la spesa. Il saldo punti su ogni tessera deve essere continuamente aggiornato. */
 CREATE OR REPLACE FUNCTION update_saldo_tessera()
 RETURNS TRIGGER AS $$
@@ -86,6 +85,10 @@ CREATE TRIGGER i_update_saldo_tessera
 AFTER INSERT ON fattura
 FOR EACH ROW
 EXECUTE FUNCTION update_saldo_tessera();
+
+/* 3.3.3. Mantenimento storico tessere. Quando un negozio viene eliminato, è necessario mantenere
+in una tabella di storico le informazioni sulle tessere che erano state emesse dal negozio stesso,
+con la data di emissione. */
 
 /* Si occupa di aggiornare la vista materializzata relativa alle tessere fedeltà dismesse attivandosi non appena un negozio venga dismesso. */
 CREATE OR REPLACE FUNCTION refresh_view_tessere_dismesse()

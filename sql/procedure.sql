@@ -192,7 +192,7 @@ $$ LANGUAGE plpgsql;
 
 /* Fatture. */
 
-/* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
+/* 3.3.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
 vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
 a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.
 L’applicazione dello sconto avviene su scelta del cliente, e lo sconto viene applicato sul totale della fattura
@@ -219,7 +219,7 @@ BEGIN
     WHERE codice_fiscale = _codice_fiscale AND dismessa = FALSE;
     -- Se i punti disponibili sono minori dei punti utilizzati allora segnala errore.
     IF _punti_disponibili < _punti_utilizzati THEN
-        RAISE EXCEPTION 'Punti insufficienti: disponibili %, richiesti %', _punti_disponibili, _punti_utilizzati;
+        RAISE EXCEPTION 'Punti insufficienti';
     END IF;
     -- Determina la percentuale di sconto in base ai punti utilizzati.
     IF _punti_utilizzati = 100 THEN
@@ -232,7 +232,7 @@ BEGIN
         _sconto_percentuale := 0.00;
     ELSE
         -- Se la quantità di punti utilizzati non è valida allora segnala errore.
-        RAISE EXCEPTION 'Numero di punti non valido';
+        RAISE EXCEPTION 'Quantità di punti utilizzati non valida';
     END IF;
     -- Salvo il totale della fattura all'interno dell'attributo _fattura_totale.
     SELECT totale
@@ -244,8 +244,7 @@ BEGIN
     -- Aggiorno il totale della fattura.
     _nuovo_totale := _fattura_totale - _sconto_euro;
     UPDATE fattura
-    SET sconto_percentuale = (_sconto_percentuale * 100)::float8,
-        totale_pagato = _nuovo_totale
+    SET sconto_percentuale = (_sconto_percentuale * 100)::FLOAT8, totale_pagato = _nuovo_totale
     WHERE codice_fattura = _codice_fattura;
     -- Se sono stati utilizzati punti allora aggiorna il saldo relativo alla tessera fedeltà dell'utente.
     IF _punti_utilizzati > 0 THEN

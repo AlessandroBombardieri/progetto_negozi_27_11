@@ -169,7 +169,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* 3.2.5. Ordine prodotti da fornitore. Quando un prodotto deve essere rifornito di una certa quantità,
+/* 3.3.5. Ordine prodotti da fornitore. Quando un prodotto deve essere rifornito di una certa quantità,
 è necessario inserire un ordine presso un determinato fornitore. Il fornitore deve essere automaticamente
 scelto sulla base del criterio di economicità (vale a dire, l’ordine viene automaticamente effettuato presso il fornitore che,
 oltre ad avere disponibili`a di prodotto sufficiente, offre il costo minore). */
@@ -339,7 +339,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* 3.2.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
+/* 3.3.2. Applicazione sconto sulla spesa. Al raggiungimento di determinate soglie di punti,
 vengono sbloccati alcuni sconti. In particolare: a 100 punti si sblocca uno sconto del 5%,
 a 200 punti del 15%, a 300 punti del 30%. Si noti che lo sconto non pu`o mai essere più elevato di 100 Euro.
 L’applicazione dello sconto avviene su scelta del cliente, e lo sconto viene applicato sul totale della fattura
@@ -474,7 +474,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* 3.2.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
+/* 3.3.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
 CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
 RETURNS TABLE (
     codice_fiscale varchar,
@@ -526,7 +526,7 @@ $$ LANGUAGE plpgsql;
 
 /* Ordini. */
 
-/* 3.2.7. Storico ordini a fornitori. Dato un fornitore, è necessario conoscere tutti gli ordini che sono stati effettuati presso di lui. */
+/* 3.3.7. Storico ordini a fornitori. Dato un fornitore, è necessario conoscere tutti gli ordini che sono stati effettuati presso di lui. */
 CREATE OR REPLACE FUNCTION get_storico_ordini_by_fornitore(_partita_iva VARCHAR)
 RETURNS TABLE (
     numero_ordine UUID,
