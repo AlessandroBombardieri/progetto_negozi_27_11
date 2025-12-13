@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Modifica prezzo prodotto</h1>
+            <h1 class="h4 mb-0">Modifica prezzo prodotto (Fornitore)</h1>
             <form method="post" action="catalogo.php" class="d-inline">
                 <input type="hidden" name="partita_iva" value="<?= htmlspecialchars($partita_iva) ?>">
                 <button type="submit" class="btn btn-outline-secondary">

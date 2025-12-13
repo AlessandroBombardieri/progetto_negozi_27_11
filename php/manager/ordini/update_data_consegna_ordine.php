@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_add'])) {
         if (update_data_consegna_ordine($numero_ordine, $data_consegna)) {
             $ok = "Data consegna inserita con successo";
         } else {
-            $err = "La data della consegna non può essere precedente rispetto alla data dell'ordine";
+            $err = "La data della consegna non può essere antecedente la data dell'ordine";
         }
     }
 }

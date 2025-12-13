@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['partita_iva'])) {
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Prodotti</h1>
+            <h1 class="h4 mb-0">Prodotti (Fornitore)</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="home.php">← Fornitori</a>
                 <form method="post" action="add_prodotto.php" class="d-inline">

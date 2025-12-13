@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['codice_negozio'])) {
 <body class="bg-light">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="h4 mb-0">Prodotti</h1>
+            <h1 class="h4 mb-0">Prodotti (Negozio)</h1>
             <div>
                 <a class="btn btn-outline-secondary me-2" href="home.php">← Negozi</a>
                 <form method="post" action="ordine.php" class="d-inline">
