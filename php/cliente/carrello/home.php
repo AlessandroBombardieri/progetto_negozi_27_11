@@ -218,7 +218,8 @@ if (!$carrello_vuoto && $codice_fiscale) {
             <form method="post" class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h5 mb-3">Sconti disponibili</h2>
-                    <p class="mb-1">Saldo punti tessera: <strong><?= (int) $saldo_punti ?></strong></p>
+                    <h1 class="h6 mb-3 text-muted">Attenzione: lo sconto massimo è pari a 100€, indipendentemente dal numero di punti utilizzati.</h1>
+                    <p class="h6 mb-1">Saldo punti tessera: <strong><?= (int) $saldo_punti ?></strong></p>
                     <!-- <p class="text-muted small mb-3">
 
                     </p> -->
@@ -240,7 +241,8 @@ if (!$carrello_vuoto && $codice_fiscale) {
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            Totale attuale: <strong><?= number_format($totale_carrello, 2, ',', '.') ?> €</strong>
+                            <h5>Totale attuale: <strong><?= number_format($totale_carrello, 2, ',', '.') ?> €</strong></h5>
+                            <h1 class="h6 mb-3 text-muted">Lo sconto selezionato verrà applicato al momento dell'acquisto.</h1>
                         </div>
                         <button type="submit" name="acquista" value="1" class="btn btn-primary">
                             Procedi all'acquisto
