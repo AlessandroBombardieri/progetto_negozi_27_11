@@ -297,6 +297,8 @@ RETURNS TABLE (
     codice_fiscale VARCHAR,
     codice_negozio UUID,
     codice_prodotto UUID,
+    prezzo FLOAT8,
+    quantita_acquistata INT8,
     data_acquisto DATE,
     totale FLOAT,
     totale_pagato FLOAT8
@@ -308,6 +310,8 @@ BEGIN
         f.codice_fiscale,
         e.codice_negozio,
         e.codice_prodotto,
+        e.prezzo,
+        e.quantita_acquistata,
         f.data_acquisto,
         f.totale,
         f.totale_pagato

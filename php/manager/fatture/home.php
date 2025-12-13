@@ -38,6 +38,8 @@ $rows = get_all_fatture();
                                 <th>Codice fiscale</th>
                                 <th>Codice negozio</th>
                                 <th>Codice prodotto</th>
+                                <th>Prezzo</th>
+                                <th>Quantità</th>
                                 <th>Data acquisto</th>
                                 <th>Totale</th>
                                 <th>Totale pagato</th>
@@ -50,6 +52,8 @@ $rows = get_all_fatture();
                                     <td><?= htmlspecialchars($r['codice_fiscale']) ?></td>
                                     <td><?= htmlspecialchars($r['codice_negozio']) ?></td>
                                     <td><?= htmlspecialchars($r['codice_prodotto']) ?></td>
+                                    <td><?= htmlspecialchars($r['prezzo']) ?></td>
+                                    <td><?= htmlspecialchars($r['quantita_acquistata']) ?></td>
                                     <td><?= htmlspecialchars($r['data_acquisto']) ?></td>
                                     <td><?= htmlspecialchars($r['totale']) ?></td>
                                     <td><?= htmlspecialchars($r['totale_pagato']) ?></td>
