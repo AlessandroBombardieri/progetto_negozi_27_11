@@ -157,7 +157,9 @@ CREATE OR REPLACE PROCEDURE dismetti_negozio(
     _nuovo_codice_negozio UUID DEFAULT NULL
 ) AS $$
 DECLARE
-    r RECORD;
+    _codice_prodotto UUID;
+    _prezzo FLOAT8;
+    _quantita INT8;
 BEGIN
     -- Revoco la validità delle tessere fedeltà relative ai clienti di tale negozio.
     UPDATE tessera_fedelta
@@ -169,22 +171,26 @@ BEGIN
     WHERE codice_negozio = _codice_negozio;
     IF _nuovo_codice_negozio IS NOT NULL THEN
         -- Se viene specificato alla procedura un secondo negozio presso il quale trasferire le scorte.
-        FOR r IN SELECT * FROM vende WHERE codice_negozio = _codice_negozio LOOP
-            -- Per ogni prodotto in vendita presso il negozio dismesso.
-            BEGIN
-                --  Se il prodotto fosse già presente allora ne viene incrementata la quantità.
-                UPDATE vende
-                SET quantita = quantita + r.quantita
-                WHERE codice_negozio = _nuovo_codice_negozio AND codice_prodotto = r.codice_prodotto;
-                -- Altrimenti crea una nuova tupla di prodotto inedito in vendita.
-                IF NOT FOUND THEN
-                    INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
-                    VALUES (_nuovo_codice_negozio, r.codice_prodotto, r.prezzo, r.quantita);
-                END IF;
-            END;
-        END LOOP;
+        FOR _codice_prodotto, _prezzo, _quantita IN 
+            SELECT codice_prodotto, prezzo, quantita
+            FROM vende
+            WHERE codice_negozio = _codice_negozio
+            LOOP
+                -- Per ogni prodotto in vendita presso il negozio dismesso.
+                BEGIN
+                -- Incremento la quantità se il prodotto dovesse essere già presente nel nuovo negozio.
+                    UPDATE vende
+                    SET quantita = quantita + _quantita
+                    WHERE codice_negozio = _nuovo_codice_negozio AND codice_prodotto = _codice_prodotto;
+                    -- Se non è stato trovato un prodotto già esistente, ne creo uno nuovo.
+                    IF NOT FOUND THEN
+                        INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
+                        VALUES (_nuovo_codice_negozio, _codice_prodotto, _prezzo, _quantita);
+                    END IF;
+                END;
+            END LOOP;
     END IF;
-    -- Elimina ogni tupla di prodotto in vendita presso il negozio dismesso.
+    -- Elimino i prodotti in vendita presso il negozio dismesso.
     DELETE FROM vende
     WHERE codice_negozio = _codice_negozio;
 END;
