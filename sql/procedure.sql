@@ -96,6 +96,9 @@ CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
     _prezzo FLOAT8
 ) AS $$
 BEGIN
+    IF _prezzo < 0 THEN
+        RAISE EXCEPTION 'Prezzo negativo non ammesso';
+    END IF;
     UPDATE venduto_da
     SET prezzo = _prezzo
     WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;

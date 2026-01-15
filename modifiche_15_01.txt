@@ -85,3 +85,17 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Modificata la seguente:
+/* Permette di modificare il prezzo di vendita di un prodotto presente nell'inventario di un fornitore. */
+CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
+    _partita_iva VARCHAR,
+    _codice_prodotto UUID,
+    _prezzo FLOAT8
+) AS $$
+BEGIN
+    UPDATE venduto_da
+    SET prezzo = _prezzo
+    WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
+END;
+$$ LANGUAGE plpgsql;
