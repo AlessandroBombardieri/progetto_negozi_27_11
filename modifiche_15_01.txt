@@ -1,5 +1,11 @@
 Modifiche 15/01:
 
+--Popolamento tabelle:
+Manager:
+insert into utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico) values('BMBLSN03D17I828V', 'alessandrobombardieri2003@gmail.com', 'manager', 'manager', 'Alessandro', 'Bombardieri', 'Sondrio', 'Tirano', 'Via Erta', '9')
+Cliente:
+insert into utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico) values('GRSLRA03R62I828E', 'laura.grosini.2003@gmail.com', 'cliente', 'cliente', 'Laura', 'Grosini', 'Sondrio', 'Sondalo', 'Via Frontale', '119')
+
 -- Modificata la seguente:
 /* Permette di dismettere, ovvero chiudere un negozio. In particolare, oltre a dismettere tutte le tessere dei clienti associati ad esso,
 è concesso specificare il codice_negozio di un secondo negozio presso il quale trasferire i prodotti ancora in vendita prima che vengano rimossi.
@@ -42,3 +48,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Modificata la seguente:
+CREATE OR REPLACE FUNCTION update_disponibilita_as_fornitore()
+RETURNS TRIGGER AS $$
+DECLARE
+    _prezzo_fornitore FLOAT8;
+BEGIN
+    -- Recupero il prezzo dell'oggetto ordinato.
+    SELECT prezzo
+    INTO _prezzo_fornitore
+    FROM venduto_da
+    WHERE partita_iva = NEW.partita_iva
+      AND codice_prodotto = NEW.codice_prodotto;
+    -- Se partita iva fornitore oppure codice prodotto non trovati allora segnala    
+    -- errore.
+    IF NOT FOUND OR _prezzo_fornitore IS NULL THEN
+        RAISE EXCEPTION 'Fornitore o prodotto mancanti';
+    END IF;
+    -- Aggiorno la quantità di prodotto ordinato in vendita dal fornitore 
+    -- sottraendo la quantità ordinata.
+    UPDATE venduto_da
+    SET quantita = quantita - NEW.quantita_ordinata
+    WHERE partita_iva = NEW.partita_iva
+      AND codice_prodotto = NEW.codice_prodotto
+      AND quantita >= NEW.quantita_ordinata;
+    -- Se la quantità disponibile è inferiore rispetto a quella ordinata allora 
+    -- segnala errore.
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Scorte insufficienti';
+    END IF;
+    -- Aggiorno la tabella vende per il negozio che ha effettuato l'ordine.
+    INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
+    VALUES (NEW.codice_negozio, NEW.codice_prodotto, _prezzo_fornitore, 				NEW.quantita_ordinata)
+    ON CONFLICT (codice_negozio, codice_prodotto)
+    DO UPDATE SET quantita = vende.quantita + EXCLUDED.quantita;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

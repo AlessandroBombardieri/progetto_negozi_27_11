@@ -10,6 +10,7 @@ CREATE OR REPLACE FUNCTION update_disponibilita_as_fornitore()
 RETURNS TRIGGER AS $$
 DECLARE
     _prezzo_fornitore FLOAT8;
+    _quantita_corrente INT8;
 BEGIN
     -- Recupero il prezzo dell'oggetto ordinato.
     SELECT prezzo
@@ -31,11 +32,23 @@ BEGIN
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Scorte insufficienti';
     END IF;
-    -- Aggiorno la tabella vende per il negozio che ha effettuato l'ordine.
-    INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
-    VALUES (NEW.codice_negozio, NEW.codice_prodotto, _prezzo_fornitore, NEW.quantita_ordinata)
-    ON CONFLICT (codice_negozio, codice_prodotto)
-    DO UPDATE SET quantita = vende.quantita + EXCLUDED.quantita;
+    -- Verifico se il prodotto è già presente nella tabella vende per il negozio specificato.
+    SELECT quantita
+    INTO _quantita_corrente
+    FROM vende
+    WHERE codice_negozio = NEW.codice_negozio
+      AND codice_prodotto = NEW.codice_prodotto;
+    -- Se il prodotto esiste, aggiorno la quantità.
+    IF FOUND THEN
+        UPDATE vende
+        SET quantita = _quantita_corrente + NEW.quantita_ordinata
+        WHERE codice_negozio = NEW.codice_negozio
+          AND codice_prodotto = NEW.codice_prodotto;
+    ELSE
+        -- Altrimenti, inserisco una nuova riga.
+        INSERT INTO vende(codice_negozio, codice_prodotto, prezzo, quantita)
+        VALUES (NEW.codice_negozio, NEW.codice_prodotto, _prezzo_fornitore, NEW.quantita_ordinata);
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
