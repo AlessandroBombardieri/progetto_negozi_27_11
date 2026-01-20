@@ -111,7 +111,7 @@ RETURNS TABLE (
     codice_prodotto UUID,
     nome VARCHAR,
     descrizione VARCHAR,
-    prezzo FLOAT8,
+    prezzo NUMERIC,
     quantita INT8
 ) AS $$
 BEGIN
@@ -134,7 +134,7 @@ RETURNS TABLE (
     codice_prodotto UUID,
     nome VARCHAR,
     descrizione VARCHAR,
-    prezzo FLOAT8,
+    prezzo NUMERIC,
     quantita INT8
 ) AS $$
 BEGIN
@@ -154,8 +154,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_prodotti_fuori_catalogo_by_fornitore(_partita_iva VARCHAR)
 RETURNS TABLE (
     codice_prodotto UUID,
-    nome           VARCHAR,
-    descrizione    VARCHAR
+    nome VARCHAR,
+    descrizione VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -181,9 +181,9 @@ CREATE OR REPLACE FUNCTION ordina_prodotto_as_negozio(
 RETURNS UUID AS $$
 DECLARE
     _partita_iva VARCHAR(11);
-    _prezzo FLOAT8;
+    _prezzo NUMERIC;
     _ordine_id UUID;
-    _totale FLOAT8;
+    _totale NUMERIC;
 BEGIN
     -- Determino il fornitore il quale vende il prodotto di interesse in quantità sufficiente al minor prezzo unitario.
     SELECT vd.partita_iva, vd.prezzo
@@ -297,11 +297,11 @@ RETURNS TABLE (
     codice_fiscale VARCHAR,
     codice_negozio UUID,
     codice_prodotto UUID,
-    prezzo FLOAT8,
+    prezzo NUMERIC,
     quantita_acquistata INT8,
     data_acquisto DATE,
-    totale FLOAT,
-    totale_pagato FLOAT8
+    totale NUMERIC,
+    totale_pagato NUMERIC
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -325,9 +325,9 @@ CREATE OR REPLACE FUNCTION get_fatture_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
     codice_fattura UUID,
     data_acquisto DATE,
-    totale FLOAT8,
+    totale NUMERIC,
     sconto_percentuale FLOAT8,
-    totale_pagato FLOAT8
+    totale_pagato NUMERIC
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -384,18 +384,16 @@ $$ language 'plpgsql';
 
 /* ... */
 CREATE OR REPLACE FUNCTION add_fattura_by_carrello(
-    _codice_fiscale varchar,
-    _codice_negozio uuid,
-    _prodotti uuid[],
-    _quantita int8[]
-) RETURNS uuid
-LANGUAGE plpgsql
-AS $$
+    _codice_fiscale VARCHAR,
+    _codice_negozio UUID,
+    _prodotti UUID[],
+    _quantita INT8[]
+) RETURNS UUID AS $$
 DECLARE
-    i int;
-    _prezzo float8;
-    _totale float8 := 0;
-    _codice_fattura uuid;
+    i INT;
+    _prezzo NUMERIC;
+    _totale NUMERIC := 0;
+    _codice_fattura UUID;
 BEGIN
     IF _prodotti IS NULL OR _quantita IS NULL THEN
         RAISE EXCEPTION 'Lista prodotti o quantità nulla';
@@ -431,7 +429,7 @@ BEGIN
     END LOOP;
     RETURN _codice_fattura;
 END;
-$$;
+$$ language 'plpgsql';
 
 /* Tessere fedeltà. */
 
@@ -439,10 +437,10 @@ $$;
 CREATE OR REPLACE FUNCTION get_tessere_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
     codice_tessera UUID,
-    saldo_punti    INT8,
+    saldo_punti INT8,
     codice_negozio UUID,
-    data_richiesta  DATE,
-    dismessa       BOOLEAN
+    data_richiesta DATE,
+    dismessa BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -462,9 +460,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_tessera_non_dismessa_by_utente(_codice_fiscale VARCHAR)
 RETURNS TABLE (
     codice_tessera UUID,
-    saldo_punti    INT8,
+    saldo_punti INT8,
     codice_negozio UUID,
-    data_richiesta  DATE
+    data_richiesta DATE
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -485,7 +483,7 @@ RETURNS TABLE (
     nome varchar,
     cognome varchar,
     email varchar,
-    saldo_punti bigint,
+    saldo_punti int,
     data_richiesta date
 ) AS $$
 BEGIN
@@ -510,7 +508,7 @@ RETURNS TABLE (
     nome varchar,
     cognome varchar,
     email varchar,
-    saldo_punti bigint,
+    saldo_punti int,
     data_richiesta date
 ) AS $$
 BEGIN
@@ -541,7 +539,7 @@ RETURNS TABLE (
     quantita_ordinata INT8,
     data_ordine DATE,
     data_consegna DATE,
-    totale FLOAT8
+    totale NUMERIC
 ) AS $$
 BEGIN
     RETURN QUERY

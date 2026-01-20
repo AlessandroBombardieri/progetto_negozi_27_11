@@ -21,7 +21,7 @@ create table ordine(
 	numero_ordine uuid primary key default gen_random_uuid(),
 	data_ordine date not null,
 	data_consegna date,
-	totale float8 not null check(totale >= 0),
+	totale numeric(10,2) not null check(totale >= 0),
 	codice_negozio uuid not null references negozio(codice_negozio),
 	codice_prodotto uuid not null references prodotto(codice_prodotto),
 	partita_iva varchar(11) not null references fornitore(partita_iva),
@@ -53,16 +53,16 @@ create table tessera_fedelta(
 create table fattura(
 	codice_fattura uuid primary key default gen_random_uuid(),
 	data_acquisto date not null,
-	totale float8 not null check (totale >= 0),
+	totale numeric(10,2) not null check (totale >= 0),
 	sconto_percentuale float8,
-	totale_pagato float8 not null check (totale_pagato >= 0 and totale_pagato <= totale),
+	totale_pagato numeric(10,2) not null check (totale_pagato >= 0 and totale_pagato <= totale),
 	codice_fiscale varchar(16) not null references utente(codice_fiscale)
 );
 
 create table vende(
 	codice_negozio uuid references negozio(codice_negozio),
 	codice_prodotto uuid references prodotto(codice_prodotto),
-	prezzo float8 not null check (prezzo >= 0),
+	prezzo numeric(10,2) not null check (prezzo >= 0),
 	quantita int8 not null check (quantita >= 0),
 	primary key(codice_negozio, codice_prodotto)
 );
@@ -70,7 +70,7 @@ create table vende(
 create table venduto_da(
 	codice_prodotto uuid references prodotto(codice_prodotto),
 	partita_iva varchar(11) references fornitore(partita_iva),
-	prezzo float8 not null check (prezzo >= 0),
+	prezzo numeric(10,2) not null check (prezzo >= 0),
 	quantita int8 not null check (quantita >= 0),
 	primary key(partita_iva, codice_prodotto)
 );
@@ -79,7 +79,7 @@ create table emette(
 	codice_negozio uuid references negozio(codice_negozio),
 	codice_prodotto uuid references prodotto(codice_prodotto),
 	codice_fattura uuid references fattura(codice_fattura),
-	prezzo float8 not null check (prezzo >= 0),
+	prezzo numeric(10,2) not null check (prezzo >= 0),
 	quantita_acquistata int8 not null check (quantita_acquistata > 0),
 	primary key(codice_negozio, codice_prodotto, codice_fattura)
-);
+);	

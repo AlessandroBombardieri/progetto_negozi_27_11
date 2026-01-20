@@ -9,7 +9,7 @@ la disponibilità di quel prodotto da quel fornitore. */
 CREATE OR REPLACE FUNCTION update_disponibilita_as_fornitore()
 RETURNS TRIGGER AS $$
 DECLARE
-    _prezzo_fornitore FLOAT8;
+    _prezzo_fornitore NUMERIC;
     _quantita_corrente INT8;
 BEGIN
     -- Recupero il prezzo dell'oggetto ordinato.

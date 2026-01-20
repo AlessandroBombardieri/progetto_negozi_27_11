@@ -100,4 +100,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- DDL massima lunghezza campi vari, e modifiche nella maxlength dei vari form HTML/PHP.
+-- DDL modificata la massima lunghezza di campi vari, modifiche anche nella maxlength dei campi all'interno dei vari form HTML/PHP.
+
+-- Backup PRE_FINALE fatto.
+
+-- In add_fattura_by_carrello sostituisco pg_query_param con pg_prepare e pg_excecute.
+
+-- cambio nel DDL i totali da float8 a numeric(10,2). Cambio anche di tutti i parametri di ritorno nelle funzioni/procedure/trigger/viste!!

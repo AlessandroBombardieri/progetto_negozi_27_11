@@ -628,7 +628,7 @@ function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizza
 /*
  * ...
  */
-function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio, array $items): ?string
+function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio, array $items)
 {
     if (empty($items)) {
         return null;
@@ -644,8 +644,9 @@ function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio,
     $quantita_pg = '{' . implode(',', $quantita) . '}';
     $params = [$codice_fiscale, $codice_negozio, $prodotti_pg, $quantita_pg];
     $sql = "SELECT add_fattura_by_carrello($1, $2, $3::uuid[], $4::int8[]) AS codice_fattura;";
-    $result = pg_query_params($db, $sql, $params);
-    if (!$result) {
+    $result = pg_prepare($db, 'add_fattura_by_carrello', $sql);
+    $result = @pg_execute($db, 'add_fattura_by_carrello', $params);
+    if ($result === false) {
         close_pg_connection($db);
         return null;
     }

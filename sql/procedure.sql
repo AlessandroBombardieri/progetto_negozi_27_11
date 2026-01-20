@@ -64,7 +64,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE add_prodotto_as_fornitore(
     _partita_iva VARCHAR,
     _codice_prodotto UUID,
-    _prezzo FLOAT8,
+    _prezzo NUMERIC,
     _quantita INT
 ) AS $$
 BEGIN
@@ -93,7 +93,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_fornitore(
     _partita_iva VARCHAR,
     _codice_prodotto UUID,
-    _prezzo FLOAT8
+    _prezzo NUMERIC
 ) AS $$
 BEGIN
     IF _prezzo < 0 THEN
@@ -109,7 +109,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE update_prezzo_prodotto_as_negozio(
     _codice_negozio UUID,
     _codice_prodotto UUID,
-    _nuovo_prezzo FLOAT8
+    _nuovo_prezzo NUMERIC
 ) AS $$
 BEGIN
     IF _nuovo_prezzo < 0 THEN
@@ -161,7 +161,7 @@ CREATE OR REPLACE PROCEDURE dismetti_negozio(
 ) AS $$
 DECLARE
     _codice_prodotto UUID;
-    _prezzo FLOAT8;
+    _prezzo NUMERIC;
     _quantita INT8;
 BEGIN
     -- Revoco la validità delle tessere fedeltà relative ai clienti di tale negozio.
@@ -216,9 +216,9 @@ CREATE OR REPLACE PROCEDURE update_totale_fattura(
 ) AS $$
 DECLARE
     _sconto_percentuale NUMERIC := 0;
-    _fattura_totale FLOAT8;
-    _sconto_euro FLOAT8 := 0;
-    _nuovo_totale FLOAT8;
+    _fattura_totale NUMERIC;
+    _sconto_euro NUMERIC := 0;
+    _nuovo_totale NUMERIC;
     _punti_disponibili INT;
 BEGIN
     -- Salvo i punti correnti dell'utente all'interno dell'attributo _punti_disponibili.
