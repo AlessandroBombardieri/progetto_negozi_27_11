@@ -80,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $tessera = $tessere[0];
                 $saldo_punti = (int) $tessera['saldo_punti'];
-
                 $punti_utilizzati = isset($_POST['sconto']) ? (int) $_POST['sconto'] : 0;
                 if ($punti_utilizzati > $saldo_punti) {
                     $err = "Punti insufficienti per lo sconto selezionato.";
@@ -220,9 +219,6 @@ if (!$carrello_vuoto && $codice_fiscale) {
                     <h2 class="h5 mb-3">Sconti disponibili</h2>
                     <h1 class="h6 mb-3 text-muted">Attenzione: lo sconto massimo è pari a 100€, indipendentemente dal numero di punti utilizzati.</h1>
                     <p class="h6 mb-1">Saldo punti tessera: <strong><?= (int) $saldo_punti ?></strong></p>
-                    <!-- <p class="text-muted small mb-3">
-
-                    </p> -->
                     <div class="mb-3">
                         <?php foreach ($opzioni_sconto as $punti): ?>
                             <div class="form-check">
