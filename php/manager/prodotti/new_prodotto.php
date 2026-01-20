@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
                 <label class="form-label">Nome</label>
-                <input name="nome" class="form-control" required>
+                <input name="nome" class="form-control" maxlength="100" required>
             </div><br>
             <div class="mb-3">
                 <label class="form-label">Descrizione</label>

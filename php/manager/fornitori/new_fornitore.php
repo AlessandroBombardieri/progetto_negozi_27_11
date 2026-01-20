@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div><br>
             <div class="col-md-4">
                 <label class="form-label">Indirizzo</label>
-                <input name="indirizzo" class="form-control" required>
+                <input name="indirizzo" class="form-control" maxlength="100" required>
             </div><br>
             <div class="d-flex gap-2">
                 <button class="btn btn-primary">Crea</button>

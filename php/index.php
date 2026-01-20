@@ -30,11 +30,11 @@ unset($_SESSION['login_error']);
                         <form id="myform" method="POST" action="lib/login.php" novalidate>
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-mail</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" maxlength="70" required>
                             </div>
                             <div class="mb-3">
                                 <label for="psw" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="psw" name="psw" required>
+                                <input type="password" class="form-control" id="psw" name="psw" maxlength="20" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Accedi</button>
                         </form>

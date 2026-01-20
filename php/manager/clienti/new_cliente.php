@@ -70,21 +70,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-4"><label class="form-label">Codice Fiscale</label><input name="codice_fiscale"
                     class="form-control" maxlength="16" required></div><br>
             <div class="col-md-4"><label class="form-label">Email</label><input name="email" type="email"
-                    class="form-control" required></div><br>
+                    class="form-control" maxlength="70" required></div><br>
             <div class="col-md-4"><label class="form-label">Password</label><input name="password" type="password"
                     class="form-control" maxlength="20" required></div><br>
             <div class="col-md-4"><label class="form-label">Nome</label><input name="nome" class="form-control"
-                    required></div><br>
+                    maxlength="30" required></div><br>
             <div class="col-md-4"><label class="form-label">Cognome</label><input name="cognome" class="form-control"
-                    required></div><br>
+                    maxlength="30" required></div><br>
             <div class="col-md-4"><label class="form-label">Provincia</label><input name="provincia"
-                    class="form-control" required></div><br>
+                    maxlength="30" class="form-control" required></div><br>
             <div class="col-md-4"><label class="form-label">Città</label><input name="citta" class="form-control"
-                    required></div><br>
-            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control" required>
+                    maxlength="30" required></div><br>
+            <div class="col-md-4"><label class="form-label">Via</label><input name="via" class="form-control"
+                    maxlength="30" required>
             </div><br>
             <div class="col-md-1"><label class="form-label">Civico</label><input name="civico" class="form-control"
-                    maxlength="3" required></div><br>
+                    maxlength="5" required></div><br>
             <div class="col-12">
                 <button class="btn btn-primary">Crea</button>
             </div>

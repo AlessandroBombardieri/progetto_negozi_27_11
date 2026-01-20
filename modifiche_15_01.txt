@@ -99,3 +99,5 @@ BEGIN
     WHERE partita_iva = _partita_iva AND codice_prodotto = _codice_prodotto;
 END;
 $$ LANGUAGE plpgsql;
+
+-- DDL massima lunghezza campi vari, e modifiche nella maxlength dei vari form HTML/PHP.

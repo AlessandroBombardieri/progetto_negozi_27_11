@@ -1,14 +1,14 @@
 create table negozio(
 	codice_negozio uuid primary key default gen_random_uuid(),
 	indirizzo varchar(100) not null,
-	orario_apertura varchar(300) not null,
+	orario_apertura varchar(500) not null,
 	nominativo_responsabile varchar(30) not null,
 	dismesso bool not null default false
 );
 
 create table prodotto(
 	codice_prodotto uuid primary key default gen_random_uuid(),
-	nome varchar(30) not null,
+	nome varchar(100) not null,
 	descrizione varchar(500) not null
 );
 
@@ -30,7 +30,7 @@ create table ordine(
 
 create table utente(
     codice_fiscale varchar(16) primary key,
-    email varchar(50) not null unique,
+    email varchar(70) not null unique,
     password varchar(20) not null,
     ruolo varchar(7) not null check (ruolo in ('cliente', 'manager')),
     nome varchar(30) not null,
@@ -38,7 +38,7 @@ create table utente(
     provincia varchar(30) not null,
     citta varchar(30) not null,
     via varchar(30) not null,
-    civico varchar(3) not null
+    civico varchar(5) not null
 );
 
 create table tessera_fedelta(

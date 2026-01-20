@@ -55,15 +55,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="post" class="card p-3 shadow-sm">
             <div class="col-md-4">
                 <label class="form-label">Indirizzo</label>
-                <input name="indirizzo" class="form-control" required>
+                <input name="indirizzo" class="form-control" maxlength="100" required>
             </div><br>
             <div class="col-md-4-3">
                 <label class="form-label">Orario di apertura</label>
-                <textarea name="orario_apertura" class="form-control" rows="4" maxlength="300"></textarea>
+                <textarea name="orario_apertura" class="form-control" rows="4" maxlength="500"></textarea>
             </div><br>
             <div class="col-md-4">
                 <label class="form-label">Nominativo responsabile</label>
-                <input name="nominativo_responsabile" class="form-control" required>
+                <input name="nominativo_responsabile" class="form-control" maxlength="30" required>
             </div><br>
             <div class="d-flex gap-2">
                 <button class="btn btn-primary">Crea</button>
