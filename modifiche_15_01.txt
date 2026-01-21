@@ -121,3 +121,5 @@ function parseError($error)
     $endPos2 = $endPos2 ? $endPos2 : PHP_INT_MAX;
     return substr($error, $startPos + 7, min($endPos1, $endPos2) - $startPos - 8);
 }
+
+-- DDL con keywords in maiuscolo.

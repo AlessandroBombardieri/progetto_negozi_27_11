@@ -430,7 +430,7 @@ BEGIN
     END LOOP;
     RETURN _codice_fattura;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 /* Tessere fedeltà. */
 
