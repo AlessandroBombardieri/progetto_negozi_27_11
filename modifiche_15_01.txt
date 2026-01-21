@@ -107,3 +107,17 @@ $$ LANGUAGE plpgsql;
 -- In add_fattura_by_carrello sostituisco pg_query_param con pg_prepare e pg_excecute.
 
 -- cambio nel DDL i totali da float8 a numeric(10,2). Cambio anche di tutti i parametri di ritorno nelle funzioni/procedure/trigger/viste!!
+
+-- rimossa:
+/**
+ * Debug.
+ */
+function parseError($error)
+{
+    $startPos = strpos($error, "ERROR:");
+    $endPos1 = strpos($error, "DETAIL"); // end position for "default" errors
+    $endPos2 = strpos($error, "CONTEX"); // end position for custom trigger exceptions
+    $endPos1 = $endPos1 ? $endPos1 : PHP_INT_MAX;
+    $endPos2 = $endPos2 ? $endPos2 : PHP_INT_MAX;
+    return substr($error, $startPos + 7, min($endPos1, $endPos2) - $startPos - 8);
+}

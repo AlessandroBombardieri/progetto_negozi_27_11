@@ -382,7 +382,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-/* ... */
+/* Permette di creare una fattura come conseguenza dell'acquisto di uno o più prodotto presenti all'interno del carrello
+di un utente presso un dato negozio e ne restituisce il codice fattura. */
 CREATE OR REPLACE FUNCTION add_fattura_by_carrello(
     _codice_fiscale VARCHAR,
     _codice_negozio UUID,

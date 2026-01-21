@@ -1,6 +1,5 @@
 <?php
 /**
- * C
  * Redirect tra le pagine php.
  */
 function redirect($url, $permanent = false)
@@ -10,21 +9,6 @@ function redirect($url, $permanent = false)
 }
 
 /**
- * C
- * Debug (temporaneo).
- */
-function parseError($error)
-{
-    $startPos = strpos($error, "ERROR:");
-    $endPos1 = strpos($error, "DETAIL"); // end position for "default" errors
-    $endPos2 = strpos($error, "CONTEX"); // end position for custom trigger exceptions
-    $endPos1 = $endPos1 ? $endPos1 : PHP_INT_MAX;
-    $endPos2 = $endPos2 ? $endPos2 : PHP_INT_MAX;
-    return substr($error, $startPos + 7, min($endPos1, $endPos2) - $startPos - 8);
-}
-
-/**
- * C
  * Apre la connessione con il server db.
  */
 function open_pg_connection()
@@ -35,7 +19,6 @@ function open_pg_connection()
 }
 
 /**
- * C
  * Chiude la connessione con il server db.
  */
 function close_pg_connection($db)
@@ -44,7 +27,6 @@ function close_pg_connection($db)
 }
 
 /**
- * M
  * Verifica il login tramite email e password.
  * 
  * Restituisce un flag true, il codice fiscale dell'utente ed il suo ruolo se il login ha avuto esito positivo, altrimenti false.
@@ -68,7 +50,6 @@ function check_login($usr, $psw)
 }
 
 /**
- * M
  * Restituisce le credenziali dell'utente dato il codice fiscale.
  */
 function get_utente_by_codice_fiscale($cf)
@@ -83,7 +64,6 @@ function get_utente_by_codice_fiscale($cf)
 }
 
 /**
- * M
  * Cambia la password dell'utente dato il codice fiscale, la vecchia password e la nuova password.
  */
 function change_password($cf, $oldpw, $newpw)
@@ -98,7 +78,6 @@ function change_password($cf, $oldpw, $newpw)
 }
 
 /**
- * M
  * Restituisce tutti i clienti.
  */
 function get_all_clienti(): array
@@ -116,7 +95,6 @@ function get_all_clienti(): array
 }
 
 /**
- * M
  * Crea un nuovo cliente.
  */
 function add_cliente($cf, $email, $password, $nome, $cognome, $provincia, $citta, $indirizzo, $civico)
@@ -131,7 +109,6 @@ function add_cliente($cf, $email, $password, $nome, $cognome, $provincia, $citta
 }
 
 /**
- * M
  * Restituisce tutti i prodotti.
  */
 function get_all_prodotti(): array
@@ -149,7 +126,6 @@ function get_all_prodotti(): array
 }
 
 /**
- * M
  * Crea un nuovo prodotto.
  */
 function add_prodotto($nome, $descrizione)
@@ -164,7 +140,6 @@ function add_prodotto($nome, $descrizione)
 }
 
 /**
- * M
  * Restituisce tutti i fornitori.
  */
 function get_all_fornitori(): array
@@ -182,7 +157,6 @@ function get_all_fornitori(): array
 }
 
 /**
- * M
  * Crea un nuovo fornitore.
  */
 function add_fornitore($partita_iva, $indirizzo)
@@ -197,7 +171,6 @@ function add_fornitore($partita_iva, $indirizzo)
 }
 
 /**
- * M
  * Restituisce tutti i prodotti a catalogo presso un dato fornitore.
  */
 function get_prodotti_by_fornitore($partita_iva)
@@ -216,7 +189,6 @@ function get_prodotti_by_fornitore($partita_iva)
 }
 
 /**
- * M
  * Restituisce tutti i prodotti non ancora in catalogo per un dato fornitore.
  */
 function get_prodotti_fuori_catalogo_by_fornitore(string $partita_iva): array
@@ -235,7 +207,6 @@ function get_prodotti_fuori_catalogo_by_fornitore(string $partita_iva): array
 }
 
 /**
- * M
  * Aggiungi un prodotto all'inventario di un dato fornitore.
  */
 function add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $quantita)
@@ -250,7 +221,6 @@ function add_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo, $qua
 }
 
 /**
- * M
  * Incrementa le scorte di un prodotto in vendita presso un dato fornitore.
  */
 function update_quantita_prodotto_as_fornitore($partita_iva, $codice_prodotto, $quantita)
@@ -265,7 +235,6 @@ function update_quantita_prodotto_as_fornitore($partita_iva, $codice_prodotto, $
 }
 
 /**
- * M
  * Modifica il prezzo di un prodotto in vendita presso un dato fornitore.
  */
 function update_prezzo_prodotto_as_fornitore($partita_iva, $codice_prodotto, $prezzo)
@@ -280,7 +249,6 @@ function update_prezzo_prodotto_as_fornitore($partita_iva, $codice_prodotto, $pr
 }
 
 /**
- * M
  * Restituisce tutti i negozi.
  */
 function get_all_negozi(): array
@@ -298,7 +266,6 @@ function get_all_negozi(): array
 }
 
 /**
- * M
  * Crea un nuovo negozio.
  */
 function add_negozio($indirizzo, $orario_apertura, $responsabile)
@@ -313,7 +280,6 @@ function add_negozio($indirizzo, $orario_apertura, $responsabile)
 }
 
 /**
- * M
  * Restituisce tutti i prodotti in vendita presso un dato negozio.
  */
 function get_prodotti_by_negozio(string $codice_negozio): array
@@ -332,8 +298,8 @@ function get_prodotti_by_negozio(string $codice_negozio): array
 }
 
 /**
- * M
- * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo.
+ * Effettua l'ordine di un prodotto scelto presso un determinato fornitore scelto automaticamente in funzione del costo
+ * e ne restituisce il numero d'ordine.
  */
 function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio)
 {
@@ -352,7 +318,6 @@ function ordina_prodotto_as_negozio($codice_prodotto, $quantita, $codice_negozio
 }
 
 /**
- * M
  * Modifica il prezzo di un prodotto in vendita presso un dato negozio.
  */
 function update_prezzo_prodotto_as_negozio($codice_negozio, $codice_prodotto, $nuovo_prezzo)
@@ -367,7 +332,6 @@ function update_prezzo_prodotto_as_negozio($codice_negozio, $codice_prodotto, $n
 }
 
 /**
- * M
  * Restituisce tutti i negozi non dismessi.
  */
 function get_negozi_non_dismessi(): array
@@ -385,7 +349,6 @@ function get_negozi_non_dismessi(): array
 }
 
 /**
- * M
  * Restituisce tutti i negozi dismessi.
  */
 function get_negozi_dismessi(): array
@@ -403,7 +366,6 @@ function get_negozi_dismessi(): array
 }
 
 /**
- * M
  * Restituisce i dati di utenti e tessere associate ad un dato negozo.
  */
 function get_tesserati_by_negozio($codice_negozio): array
@@ -426,7 +388,6 @@ function get_tesserati_by_negozio($codice_negozio): array
 }
 
 /**
- * M
  * Restituisce i dati di utenti e tessere associate ad un dato negozo dismesso.
  */
 function get_tesserati_by_negozio_dismesso($codice_negozio): array
@@ -449,7 +410,6 @@ function get_tesserati_by_negozio_dismesso($codice_negozio): array
 }
 
 /**
- * M
  * Crea una nuova tessera fedeltà.
  */
 function add_tessera($codice_negozio, $codice_fiscale)
@@ -464,7 +424,6 @@ function add_tessera($codice_negozio, $codice_fiscale)
 }
 
 /**
- * M
  * Restituisce i dati delle tessere associate a clienti premium, ovvero con un saldo punti superiore a 300 punti.
  */
 function get_tesserati_premium(): array
@@ -486,7 +445,6 @@ function get_tesserati_premium(): array
 }
 
 /**
- * M
  * Restituisce i dati degli ordini effettuati presso un dato fornitore.
  */
 function get_storico_ordini_by_fornitore($partita_iva): array
@@ -509,7 +467,6 @@ function get_storico_ordini_by_fornitore($partita_iva): array
 }
 
 /**
- * M
  * Modifica il prezzo di un prodotto in vendita presso un dato negozio.
  */
 function update_data_consegna_ordine($numero_ordine, $data_consegna)
@@ -524,7 +481,6 @@ function update_data_consegna_ordine($numero_ordine, $data_consegna)
 }
 
 /**
- * M
  * Dismetti un dato negozio. Otre a dismettere tutte le tessere dei clienti associati ad esso,
  * è concesso specificare il codice_negozio di un secondo negozio presso il quale trasferire
  * i prodotti ancora in vendita prima che vengano rimossi.
@@ -542,7 +498,6 @@ function dismetti_negozio($codice_negozio, $nuovo_codice_negozio)
 }
 
 /**
- * M
  * Restituisce i dati delle tessere fedeltà associate ad un dato utente, comprese quelle dismesse.
  */
 function get_tessere_by_utente($codice_fiscale): array
@@ -565,7 +520,6 @@ function get_tessere_by_utente($codice_fiscale): array
 }
 
 /**
- * M
  * Restituisce i dati della tessera fedeltà non dismessa associate ad un dato utente, se presente.
  */
 function get_tessera_non_dismessa_by_utente($codice_fiscale): array
@@ -588,7 +542,6 @@ function get_tessera_non_dismessa_by_utente($codice_fiscale): array
 }
 
 /**
- * M
  * Restituisce gli sconti applicabili a seconda del saldo punti presente sulla tessera fedeltà non dismessa dell'utente, se presente.
  */
 function get_sconti_applicabili($codice_fiscale): array
@@ -611,7 +564,6 @@ function get_sconti_applicabili($codice_fiscale): array
 }
 
 /**
- * M
  * Applica lo sconto selezionato identificato tramite la quantità di punti utilizzati sul totale della relativa fattura.
  */
 function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizzati)
@@ -626,7 +578,8 @@ function update_totale_fattura($codice_fattura, $codice_fiscale, $punti_utilizza
 }
 
 /*
- * ...
+ * Crea una fattura come conseguenza dell'acquisto di uno o più prodotto presenti all'interno del carrello
+ * di un utente presso un dato negozio e ne restituisce il codice fattura.
  */
 function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio, array $items)
 {
@@ -656,7 +609,6 @@ function add_fattura_by_carrello(string $codice_fiscale, string $codice_negozio,
 }
 
 /**
- * M
  * Restituisce le fatture relative agli acquisti di un dato utente.
  */
 function get_fatture_by_utente($codice_fiscale): array
@@ -679,7 +631,6 @@ function get_fatture_by_utente($codice_fiscale): array
 }
 
 /**
- * M
  * Restituisce tutte le fatture.
  */
 function get_all_fatture(): array
