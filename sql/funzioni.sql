@@ -380,7 +380,7 @@ BEGIN
         RETURN QUERY SELECT 300, 30.0;
     END IF;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 /* Permette di creare una fattura come conseguenza dell'acquisto di uno o più prodotto presenti all'interno del carrello
 di un utente presso un dato negozio e ne restituisce il codice fattura. */
@@ -478,14 +478,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* 3.3.6. Lista tesserati. Dato un negozio, è necessario conoscere la lista dei clienti ai quali il negozio ha emesso la tessera fedeltà. */
-CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio uuid)
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio(_codice_negozio UUID)
 RETURNS TABLE (
-    codice_fiscale varchar,
-    nome varchar,
-    cognome varchar,
-    email varchar,
-    saldo_punti int,
-    data_richiesta date
+    codice_fiscale VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    email VARCHAR,
+    saldo_punti INT,
+    data_richiesta DATE
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -503,14 +503,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* Permette di ottenere i dati relativi alle tessere fedeltà emesse da un negozio dismesso. */
-CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio uuid)
+CREATE OR REPLACE FUNCTION get_tesserati_by_negozio_dismesso(_codice_negozio UUID)
 RETURNS TABLE (
-    codice_fiscale varchar,
-    nome varchar,
-    cognome varchar,
-    email varchar,
-    saldo_punti int,
-    data_richiesta date
+    codice_fiscale VARCHAR,
+    nome VARCHAR,
+    cognome VARCHAR,
+    email VARCHAR,
+    saldo_punti INT,
+    data_richiesta DATE
 ) AS $$
 BEGIN
     RETURN QUERY

@@ -1,6 +1,6 @@
 /* Viste. */
 
-/* Utenti/Clienti */
+/* Utenti/Clienti. */
 
 /* 3.3.8. Saldi punti. E' necessario mantenere un elenco aggiornato dei clienti che hanno una tessera fedeltà con un saldo punti superiore a 300 punti. */
 CREATE VIEW view_clienti_almeno_300_punti AS

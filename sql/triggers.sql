@@ -92,7 +92,7 @@ BEGIN
     WHERE codice_fiscale = NEW.codice_fiscale AND dismessa = FALSE;
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER i_update_saldo_tessera
 AFTER INSERT ON fattura

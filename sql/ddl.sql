@@ -1,3 +1,5 @@
+/* DDL. */
+
 CREATE TABLE negozio(
     codice_negozio UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     indirizzo VARCHAR(100) NOT NULL,
