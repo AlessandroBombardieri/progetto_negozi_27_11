@@ -15,6 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ) {
         $err = "Compila tutti i campi";
     }
+    if (
+        !$err && strlen($partita_iva) !== 11) {
+        $err = "Formato partita IVA non valido";
+    }
     if (!$err) {
         if (
             add_fornitore(

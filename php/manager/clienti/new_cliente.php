@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ) {
         $err = "Compila tutti i campi";
     }
+    if (
+        !$err && strlen($codice_fiscale) !== 16) {
+        $err = "Formato codice fiscale non valido";
+    }
     if (!$err) {
         if (
             add_cliente(
