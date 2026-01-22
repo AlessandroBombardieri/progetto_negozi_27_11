@@ -484,7 +484,7 @@ RETURNS TABLE (
     nome VARCHAR,
     cognome VARCHAR,
     email VARCHAR,
-    saldo_punti INT,
+    saldo_punti INT8,
     data_richiesta DATE
 ) AS $$
 BEGIN
@@ -509,7 +509,7 @@ RETURNS TABLE (
     nome VARCHAR,
     cognome VARCHAR,
     email VARCHAR,
-    saldo_punti INT,
+    saldo_punti INT8,
     data_richiesta DATE
 ) AS $$
 BEGIN
