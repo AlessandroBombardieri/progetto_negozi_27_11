@@ -58,8 +58,8 @@ CREATE OR REPLACE FUNCTION get_utente_by_codice_fiscale(_codice_fiscale VARCHAR)
 RETURNS TABLE (
     codice_fiscale VARCHAR,
     email VARCHAR,
-    ruolo VARCHAR,
     password VARCHAR,
+    ruolo VARCHAR,
     nome VARCHAR,
     cognome VARCHAR,
     provincia VARCHAR,
