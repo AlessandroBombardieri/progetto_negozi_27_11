@@ -1,4 +1,4 @@
-/* DDL. */
+/* Tabelle. */
 
 CREATE TABLE negozio(
     codice_negozio UUID PRIMARY KEY DEFAULT gen_random_uuid(),
