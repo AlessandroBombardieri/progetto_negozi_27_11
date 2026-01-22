@@ -42,6 +42,10 @@ CREATE OR REPLACE PROCEDURE add_cliente(
     _civico VARCHAR
 ) AS $$
 BEGIN
+    -- Controllo lunghezza codice fiscale.
+    IF LENGTH(_codice_fiscale) <> 16 THEN
+        RAISE EXCEPTION 'Formato codice fiscale non valido.';
+    END IF;
     INSERT INTO utente(codice_fiscale, email, password, ruolo, nome, cognome, provincia, citta, via, civico)
     VALUES (_codice_fiscale, _email, _password, 'cliente', _nome, _cognome, _provincia, _citta, _via, _civico);
 END;
@@ -133,6 +137,10 @@ CREATE OR REPLACE PROCEDURE add_fornitore(
     _indirizzo VARCHAR
 ) AS $$
 BEGIN
+    -- Controllo lunghezza partita IVA.
+    IF LENGTH(_partita_iva) <> 11 THEN
+        RAISE EXCEPTION 'Formato partita IVA non valido.';
+    END IF;
     INSERT INTO fornitore(partita_iva, indirizzo)
     VALUES (_partita_iva, _indirizzo);
 END;
